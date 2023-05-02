@@ -19,7 +19,7 @@ if [ "$1" != "" ]; then
 else
   "read" "-p" "Which installation method do you prefer? [DOCKER/local]: " "type"
 fi
-defaultPort="3001"
+defaultPort="7070"
 function checkNode {
   local _0
   nodeVersion=$(node -e 'console.log(process.versions.node.split(`.`)[0])')
@@ -198,6 +198,6 @@ fi
   "echo" "-e" "Port: $port"
   "echo" "-e" "Volume: $volume"
   docker volume create $volume
-  docker run -d --restart=always -p $port:3001 -v $volume:/app/data --name uptime-kuma louislam/uptime-kuma:1
+  docker run -d --restart=always -p $port:7070 -v $volume:/app/data --name uptime-kuma louislam/uptime-kuma:1
 fi
 "echo" "-e" "http://localhost:$port"

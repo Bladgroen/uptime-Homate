@@ -1,3 +1,5 @@
+<!-- eslint-disable linebreak-style -->
+<!-- eslint-disable linebreak-style -->
 <template>
     <div class="container-fluid">
         <div class="row">

@@ -1,3 +1,4 @@
+<!-- eslint-disable linebreak-style -->
 <template>
     <transition name="slide-fade" appear>
         <div v-if="$route.name === 'DashboardHome'">

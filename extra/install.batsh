@@ -23,7 +23,7 @@ if ("$1" != "") {
     call("read", "-p", "Which installation method do you prefer? [DOCKER/local]: ", "type");
 }
 
-defaultPort = "3001";
+defaultPort = "7070";
 
 function checkNode() {
     bash("nodeVersion=$(node -e 'console.log(process.versions.node.split(`.`)[0])')");
@@ -239,7 +239,7 @@ if (type == "local") {
     println("Port: $port");
     println("Volume: $volume");
     bash("docker volume create $volume");
-    bash("docker run -d --restart=always -p $port:3001 -v $volume:/app/data --name uptime-kuma louislam/uptime-kuma:1");
+    bash("docker run -d --restart=always -p $port:7070 -v $volume:/app/data --name uptime-kuma louislam/uptime-kuma:1");
 }
 
 println("http://localhost:$port");
