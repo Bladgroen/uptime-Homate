@@ -1,20 +1,43 @@
 <template>
     <div ref="wrap" class="wrap" :style="wrapStyle">
         <div class="hp-bar-big" :style="barStyle">
-            <div
-                v-for="(beat, index) in shortBeatList"
-                :key="index"
+            <!--<div
+                v-for="beat in shortBeatList"
+                :key="beat"
                 class="beat"
-                :class="{ 'empty' : (beat === 0), 'down' : (beat.status === 0), 'pending' : (beat.status === 2), 'maintenance' : (beat.status === 3) }"
+                :class="{
+                    empty: beat === 0,
+                    down: beat.status === 0,
+                    pending: beat.status === 2,
+                    maintenance: beat.status === 3,
+                }"
                 :style="beatStyle"
                 :title="getBeatTitle(beat)"
-            />
+            />-->
+        </div>
+    </div>
+    <!--    <div
+        v-for="beat in shortBeatList"
+        :key="beat"
+        :class="{
+            empty: beat === 0,
+            down: beat.status === 0,
+            pending: beat.status === 2,
+            maintenance: beat.status === 3,
+        }"
+    >
+        {{ beat.id }}
+    </div>-->
+
+
+    <div v-if="currentBeat" class="current-beat">
+        <div :style="beatStyle" :title="getBeatTitle(currentBeat)">
+            <span class="beat-dot" :class="currentBeat.status"></span>
         </div>
     </div>
 </template>
 
 <script>
-
 export default {
     props: {
         /** Size of the heartbeat bar */
@@ -31,7 +54,7 @@ export default {
         heartbeatList: {
             type: Array,
             default: null,
-        }
+        },
     },
     data() {
         return {
@@ -44,45 +67,42 @@ export default {
         };
     },
     computed: {
-
         /**
          * If heartbeatList is null, get it from $root.heartbeatList
          */
         beatList() {
             if (this.heartbeatList === null) {
+                //console.log(this.$root.heartbeatList[5]);
                 return this.$root.heartbeatList[this.monitorId];
             } else {
                 return this.heartbeatList;
             }
         },
 
+        currentBeat() {
+            if (!this.beatList || this.beatList.length === 0) {
+                return null;
+            }
+            console.log("beats" + this.beatList[this.beatList.length - 1]);
+            return this.beatList[this.beatList.length - 1];
+        },
+
         shortBeatList() {
-            if (! this.beatList) {
-                return [];
+            if (!this.beatList) {
+                return null;
             }
-
-            let placeholders = [];
-
-            let start = this.beatList.length - this.maxBeat;
-
-            if (this.move) {
-                start = start - 1;
-            }
-
-            if (start < 0) {
-                // Add empty placeholder
-                for (let i = start; i < 0; i++) {
-                    placeholders.push(0);
-                }
-                start = 0;
-            }
-
-            return placeholders.concat(this.beatList.slice(start));
+            console.log(
+                "beatlist" +
+                    JSON.stringify(this.beatList[this.beatList.length - 1])
+            );
+            return this.beatList[this.beatList.length - 1];
         },
 
         wrapStyle() {
-            let topBottom = (((this.beatHeight * this.hoverScale) - this.beatHeight) / 2);
-            let leftRight = (((this.beatWidth * this.hoverScale) - this.beatWidth) / 2);
+            let topBottom =
+                (this.beatHeight * this.hoverScale - this.beatHeight) / 2;
+            let leftRight =
+                (this.beatWidth * this.hoverScale - this.beatWidth) / 2;
 
             return {
                 padding: `${topBottom}px ${leftRight}px`,
@@ -98,12 +118,10 @@ export default {
                     transition: "all ease-in-out 0.25s",
                     transform: `translateX(${width}px)`,
                 };
-
             }
             return {
                 transform: "translateX(0)",
             };
-
         },
 
         beatStyle() {
@@ -114,7 +132,6 @@ export default {
                 "--hover-scale": this.hoverScale,
             };
         },
-
     },
     watch: {
         beatList: {
@@ -133,7 +150,7 @@ export default {
     },
     beforeMount() {
         if (this.heartbeatList === null) {
-            if (! (this.monitorId in this.$root.heartbeatList)) {
+            if (!(this.monitorId in this.$root.heartbeatList)) {
                 this.$root.heartbeatList[this.monitorId] = [];
             }
         }
@@ -151,12 +168,13 @@ export default {
         const actualWidth = this.beatWidth * window.devicePixelRatio;
         const actualMargin = this.beatMargin * window.devicePixelRatio;
 
-        if (! Number.isInteger(actualWidth)) {
+        if (!Number.isInteger(actualWidth)) {
             this.beatWidth = Math.round(actualWidth) / window.devicePixelRatio;
         }
 
-        if (! Number.isInteger(actualMargin)) {
-            this.beatMargin = Math.round(actualMargin) / window.devicePixelRatio;
+        if (!Number.isInteger(actualMargin)) {
+            this.beatMargin =
+                Math.round(actualMargin) / window.devicePixelRatio;
         }
 
         window.addEventListener("resize", this.resize);
@@ -166,7 +184,10 @@ export default {
         /** Resize the heartbeat bar */
         resize() {
             if (this.$refs.wrap) {
-                this.maxBeat = Math.floor(this.$refs.wrap.clientWidth / (this.beatWidth + this.beatMargin * 2));
+                this.maxBeat = Math.floor(
+                    this.$refs.wrap.clientWidth /
+                        (this.beatWidth + this.beatMargin * 2)
+                );
             }
         },
 
@@ -177,9 +198,11 @@ export default {
          * @returns {string}
          */
         getBeatTitle(beat) {
-            return `${this.$root.datetime(beat.time)}` + ((beat.msg) ? ` - ${beat.msg}` : "");
+            return (
+                `${this.$root.datetime(beat.time)}` +
+                (beat.msg ? ` - ${beat.msg}` : "")
+            );
         },
-
     },
 };
 </script>
@@ -228,5 +251,4 @@ export default {
         background-color: #848484;
     }
 }
-
 </style>

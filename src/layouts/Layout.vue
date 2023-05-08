@@ -28,7 +28,7 @@
                 class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none"
             >
 
-                <!--TODO Padding op dezelfde lijn plaatsen-->
+
                 <img
                     src="/Homate.jpg"
                     class="bi me-2 ms-4 logo"
