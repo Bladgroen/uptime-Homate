@@ -1,9 +1,5 @@
 module.exports = {
-    ignorePatterns: [
-        "test/*",
-        "server/modules/apicache/*",
-        "src/util.js"
-    ],
+    ignorePatterns: ["test/*", "server/modules/apicache/*", "src/util.js"],
     root: true,
     env: {
         browser: true,
@@ -11,10 +7,7 @@ module.exports = {
         es2020: true,
         node: true,
     },
-    extends: [
-        "eslint:recommended",
-        "plugin:vue/vue3-recommended",
-    ],
+    extends: ["eslint:recommended", "plugin:vue/vue3-recommended"],
     parser: "vue-eslint-parser",
     parserOptions: {
         parser: "@babel/eslint-parser",
@@ -22,48 +15,64 @@ module.exports = {
         requireConfigFile: false,
     },
     rules: {
-        "yoda": "error",
-        eqeqeq: [ "warn", "smart" ],
-        "linebreak-style": [ "error", "unix" ],
-        "camelcase": [ "warn", {
-            "properties": "never",
-            "ignoreImports": true
-        }],
-        "no-unused-vars": [ "warn", {
-            "args": "none"
-        }],
+        yoda: "error",
+        eqeqeq: ["warn", "smart"],
+        /*"linebreak-style": [ "error", "windows" ],*/
+        camelcase: [
+            "warn",
+            {
+                properties: "never",
+                ignoreImports: true,
+            },
+        ],
+        "no-unused-vars": [
+            "warn",
+            {
+                args: "none",
+            },
+        ],
         indent: [
             "error",
             4,
             {
-                ignoredNodes: [ "TemplateLiteral" ],
+                ignoredNodes: ["TemplateLiteral"],
                 SwitchCase: 1,
             },
         ],
-        quotes: [ "error", "double" ],
+        quotes: ["error", "double"],
         semi: "error",
-        "vue/html-indent": [ "error", 4 ], // default: 2
+        "vue/html-indent": ["error", 4], // default: 2
         "vue/max-attributes-per-line": "off",
         "vue/singleline-html-element-content-newline": "off",
         "vue/html-self-closing": "off",
-        "vue/require-component-is": "off",      // not allow is="style" https://github.com/vuejs/eslint-plugin-vue/issues/462#issuecomment-430234675
-        "vue/attribute-hyphenation": "off",     // This change noNL to "no-n-l" unexpectedly
+        "vue/require-component-is": "off", // not allow is="style" https://github.com/vuejs/eslint-plugin-vue/issues/462#issuecomment-430234675
+        "vue/attribute-hyphenation": "off", // This change noNL to "no-n-l" unexpectedly
         "vue/multi-word-component-names": "off",
-        "no-multi-spaces": [ "error", {
-            ignoreEOLComments: true,
-        }],
-        "array-bracket-spacing": [ "warn", "always", {
-            "singleValue": true,
-            "objectsInArrays": false,
-            "arraysInArrays": false
-        }],
-        "space-before-function-paren": [ "error", {
-            "anonymous": "always",
-            "named": "never",
-            "asyncArrow": "always"
-        }],
-        "curly": "error",
-        "object-curly-spacing": [ "error", "always" ],
+        "no-multi-spaces": [
+            "error",
+            {
+                ignoreEOLComments: true,
+            },
+        ],
+        "array-bracket-spacing": [
+            "warn",
+            "always",
+            {
+                singleValue: true,
+                objectsInArrays: false,
+                arraysInArrays: false,
+            },
+        ],
+        "space-before-function-paren": [
+            "error",
+            {
+                anonymous: "always",
+                named: "never",
+                asyncArrow: "always",
+            },
+        ],
+        curly: "error",
+        "object-curly-spacing": ["error", "always"],
         "object-curly-newline": "off",
         "object-property-newline": "error",
         "comma-spacing": "error",
@@ -74,45 +83,55 @@ module.exports = {
         "space-infix-ops": "warn",
         "arrow-spacing": "warn",
         "no-trailing-spaces": "error",
-        "no-constant-condition": [ "error", {
-            "checkLoops": false,
-        }],
+        "no-constant-condition": [
+            "error",
+            {
+                checkLoops: false,
+            },
+        ],
         "space-before-blocks": "warn",
         //'no-console': 'warn',
         "no-extra-boolean-cast": "off",
-        "no-multiple-empty-lines": [ "warn", {
-            "max": 1,
-            "maxBOF": 0,
-        }],
-        "lines-between-class-members": [ "warn", "always", {
-            exceptAfterSingleLine: true,
-        }],
+        "no-multiple-empty-lines": [
+            "warn",
+            {
+                max: 1,
+                maxBOF: 0,
+            },
+        ],
+        "lines-between-class-members": [
+            "warn",
+            "always",
+            {
+                exceptAfterSingleLine: true,
+            },
+        ],
         "no-unneeded-ternary": "error",
-        "array-bracket-newline": [ "error", "consistent" ],
-        "eol-last": [ "error", "always" ],
+        "array-bracket-newline": ["error", "consistent"],
+        "eol-last": ["error", "always"],
         //'prefer-template': 'error',
-        "comma-dangle": [ "warn", "only-multiline" ],
-        "no-empty": [ "error", {
-            "allowEmptyCatch": true
-        }],
+        "comma-dangle": ["warn", "only-multiline"],
+        "no-empty": [
+            "error",
+            {
+                allowEmptyCatch: true,
+            },
+        ],
         "no-control-regex": "off",
-        "one-var": [ "error", "never" ],
-        "max-statements-per-line": [ "error", { "max": 1 }]
+        "one-var": ["error", "never"],
+        "max-statements-per-line": ["error", { max: 1 }],
     },
-    "overrides": [
+    overrides: [
         {
-            "files": [ "src/languages/*.js", "src/icon.js" ],
-            "rules": {
-                "comma-dangle": [ "error", "always-multiline" ],
-            }
+            files: ["src/languages/*.js", "src/icon.js"],
+            rules: {
+                "comma-dangle": ["error", "always-multiline"],
+            },
         },
 
         // Override for jest puppeteer
         {
-            "files": [
-                "**/*.spec.js",
-                "**/*.spec.jsx"
-            ],
+            files: ["**/*.spec.js", "**/*.spec.jsx"],
             env: {
                 jest: true,
             },
@@ -122,6 +141,6 @@ module.exports = {
                 context: true,
                 jestPuppeteer: true,
             },
-        }
-    ]
+        },
+    ],
 };
