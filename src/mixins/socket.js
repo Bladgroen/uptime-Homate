@@ -1,8 +1,8 @@
+import dayjs from "dayjs";
+import Favico from "favico.js";
+import jwtDecode from "jwt-decode";
 import { io } from "socket.io-client";
 import { useToast } from "vue-toastification";
-import jwtDecode from "jwt-decode";
-import Favico from "favico.js";
-import dayjs from "dayjs";
 import { DOWN, MAINTENANCE, PENDING, UP } from "../util.ts";
 const toast = useToast();
 
