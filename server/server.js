@@ -14,6 +14,9 @@ dayjs.extend(require("dayjs/plugin/customParseFormat"));
 // Load environment variables from `.env`
 require("dotenv").config();
 
+//import custom api calls
+const { getAddOns } = require("./HomateLogic/StatusMonitor.ts");
+
 // Check Node.js Version
 const nodeVersion = parseInt(process.versions.node.split(".")[0]);
 const requiredVersion = 14;
@@ -731,7 +734,7 @@ let needSetup = false;
 
                 bean.validate();
                 await R.store(bean);
-                createAddons(bean.id);
+                await createAddons(bean.id);
                 await updateMonitorNotification(bean.id, notificationIDList);
 
                 await server.sendMonitorList(socket);
@@ -761,6 +764,7 @@ let needSetup = false;
         });
 
         async function createAddons(monitorID) {
+            let test = 5;
             const addon = {
                 name: "test",
                 active: 1,
@@ -771,14 +775,17 @@ let needSetup = false;
                 icon: "https://uptime-kuma.com/assets/icon.png",
                 monitor_id: monitorID,
             };
-            let addonDB = R.dispense("add_ons");
-            addonDB.import(addon);
-            console.log(addonDB);
-            console.log("testen", await R.store(addonDB));
-            await R.store(addonDB);
+            const add = await getAddOns();
+            console.log(add);
+
+            for (let i = 0; i < test; i++) {
+                let addonDB = R.dispense("add_ons");
+                addonDB.import(addon);
+                await R.store(addonDB);
+            }
         }
 
-        // Edit a monitor
+        // Edit monitor
         socket.on("editMonitor", async (monitor, callback) => {
             try {
                 checkLogin(socket);
