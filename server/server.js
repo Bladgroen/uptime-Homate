@@ -734,7 +734,8 @@ let needSetup = false;
 
                 bean.validate();
                 await R.store(bean);
-                await createAddons(bean.id);
+
+                await createAddons(bean.id, monitor.url);
                 await updateMonitorNotification(bean.id, notificationIDList);
 
                 await server.sendMonitorList(socket);
@@ -763,26 +764,23 @@ let needSetup = false;
             }
         });
 
-        async function createAddons(monitorID) {
-            let test = 5;
-            const addon = {
-                name: "test",
-                active: 1,
-                slug: "test",
-                url: "https://uptime-kuma.com",
-                version: "1.0.0",
-                update_available: false,
-                icon: "https://uptime-kuma.com/assets/icon.png",
-                monitor_id: monitorID,
-            };
-            const add = await getAddOns();
-            console.log(add);
-
-            for (let i = 0; i < test; i++) {
+        async function createAddons(monitorID, monitorURL) {
+            const addOn = await getAddOns(monitorURL);
+            addOn.forEach(async (addOn) => {
+                const addon = {
+                    name: addOn.name,
+                    active: addOn.state === "started",
+                    slug: addOn.slug,
+                    url: addOn.url,
+                    version: addOn.version,
+                    update_available: addOn.update_available,
+                    icon: addOn.icon,
+                    monitor_id: monitorID,
+                };
                 let addonDB = R.dispense("add_ons");
                 addonDB.import(addon);
                 await R.store(addonDB);
-            }
+            });
         }
 
         // Edit monitor
