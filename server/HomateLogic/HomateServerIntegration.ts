@@ -22,8 +22,8 @@ async function getAddOns(monitorURL) {
                 version: addon.version,
                 update_available: addon.update_available,
                 state: addon.state,
-                url: apiURL + addon.slug + "/stats",
-                icon: apiURL + addon.slug + "/icon",
+                url: apiURL + "/" + addon.slug + "/stats",
+                icon: apiURL + "/" + addon.slug + "/icon",
             };
         });
 
@@ -56,17 +56,12 @@ async function createAddons(monitorID, monitorURL) {
     }
 }
 
-async function updateAddOns(monitorURL, monitorID) {
+async function deleteAddOns(monitorID) {
     try {
-        const apiURL = monitorURL + "/api/hassio/addons";
         await R.exec("DELETE FROM add_ons WHERE monitor_id = ? ", [monitorID]);
-        console.log(
-            "🚀 ~ file: HomateServerIntegration.ts:40 ~ updateAddOns ~ R:" +
-                monitorID
-        );
     } catch (error) {
         console.error(error);
     }
 }
 
-module.exports = { getAddOns, updateAddOns, createAddons };
+module.exports = { getAddOns, deleteAddOns, createAddons };

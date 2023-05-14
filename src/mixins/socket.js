@@ -34,8 +34,10 @@ export default {
             allowLoginDialog: false, // Allowed to show login dialog, but "loggedIn" have to be true too. This exists because prevent the login dialog show 0.1s in first before the socket server auth-ed.
             loggedIn: false,
             monitorList: {},
+            addOnList: {},
             maintenanceList: {},
             apiKeyList: {},
+            test: "dit is een test",
             heartbeatList: {},
             importantHeartbeatList: {},
             avgPingList: {},
@@ -129,6 +131,14 @@ export default {
                     };
                 });
                 this.monitorList = data;
+            });
+
+            socket.on("addOnsList", (data) => {
+                this.addOnList = data;
+                console.log(
+                    "🚀 ~ file: socket.js:137 ~ socket.on ~ data:",
+                    data
+                );
             });
 
             socket.on("maintenanceList", (data) => {

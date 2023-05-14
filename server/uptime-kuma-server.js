@@ -57,9 +57,7 @@ class UptimeKumaServer {
      *
      * @type {{}}
      */
-    static monitorTypeList = {
-
-    };
+    static monitorTypeList = {};
 
     static getInstance(args) {
         if (UptimeKumaServer.instance == null) {
@@ -70,19 +68,34 @@ class UptimeKumaServer {
 
     constructor(args) {
         // SSL
-        const sslKey = args["ssl-key"] || process.env.UPTIME_KUMA_SSL_KEY || process.env.SSL_KEY || undefined;
-        const sslCert = args["ssl-cert"] || process.env.UPTIME_KUMA_SSL_CERT || process.env.SSL_CERT || undefined;
-        const sslKeyPassphrase = args["ssl-key-passphrase"] || process.env.UPTIME_KUMA_SSL_KEY_PASSPHRASE || process.env.SSL_KEY_PASSPHRASE || undefined;
+        const sslKey =
+            args["ssl-key"] ||
+            process.env.UPTIME_KUMA_SSL_KEY ||
+            process.env.SSL_KEY ||
+            undefined;
+        const sslCert =
+            args["ssl-cert"] ||
+            process.env.UPTIME_KUMA_SSL_CERT ||
+            process.env.SSL_CERT ||
+            undefined;
+        const sslKeyPassphrase =
+            args["ssl-key-passphrase"] ||
+            process.env.UPTIME_KUMA_SSL_KEY_PASSPHRASE ||
+            process.env.SSL_KEY_PASSPHRASE ||
+            undefined;
 
         log.info("server", "Creating express and socket.io instance");
         this.app = express();
         if (sslKey && sslCert) {
             log.info("server", "Server Type: HTTPS");
-            this.httpServer = https.createServer({
-                key: fs.readFileSync(sslKey),
-                cert: fs.readFileSync(sslCert),
-                passphrase: sslKeyPassphrase,
-            }, this.app);
+            this.httpServer = https.createServer(
+                {
+                    key: fs.readFileSync(sslKey),
+                    cert: fs.readFileSync(sslCert),
+                    passphrase: sslKeyPassphrase,
+                },
+                this.app
+            );
         } else {
             log.info("server", "Server Type: HTTP");
             this.httpServer = http.createServer(this.app);
@@ -93,7 +106,10 @@ class UptimeKumaServer {
         } catch (e) {
             // "dist/index.html" is not necessary for development
             if (process.env.NODE_ENV !== "development") {
-                log.error("server", "Error: Cannot find 'dist/index.html', did you install correctly?");
+                log.error(
+                    "server",
+                    "Error: Cannot find 'dist/index.html', did you install correctly?"
+                );
                 process.exit(1);
             }
         }
@@ -120,7 +136,14 @@ class UptimeKumaServer {
      */
     async sendMonitorList(socket) {
         let list = await this.getMonitorJSONList(socket.userID);
+        let addon = await this.getAddOnsList();
+        console.log(
+            "🚀 ~ file: uptime-kuma-server.js:140 ~ UptimeKumaServer ~ sendMonitorList ~ list2:",
+            addon
+        );
         this.io.to(socket.userID).emit("monitorList", list);
+        this.io.to(socket.userID).emit("addOnsList", addon);
+
         return list;
     }
 
@@ -134,15 +157,33 @@ class UptimeKumaServer {
     async getMonitorJSONList(userID) {
         let result = {};
 
-        let monitorList = await R.find("monitor", " user_id = ? ORDER BY weight DESC, name", [
-            userID,
-        ]);
+        let monitorList = await R.find(
+            "monitor",
+            " user_id = ? ORDER BY weight DESC, name",
+            [userID]
+        );
 
         for (let monitor of monitorList) {
             result[monitor.id] = await monitor.toJSON();
         }
 
         return result;
+    }
+
+    async getAddOnsList() {
+        let addonList = await R.findAll("add_ons");
+        let organizedData = {};
+
+        addonList.forEach((row) => {
+            const key = row.monitor_id.toString();
+            if (organizedData[key]) {
+                organizedData[key].push(row);
+            } else {
+                organizedData[key] = [row];
+            }
+        });
+
+        return organizedData;
     }
 
     /**
@@ -173,7 +214,9 @@ class UptimeKumaServer {
     async getMaintenanceJSONList(userID) {
         let result = {};
         for (let maintenanceID in this.maintenanceList) {
-            result[maintenanceID] = await this.maintenanceList[maintenanceID].toJSON();
+            result[maintenanceID] = await this.maintenanceList[
+                maintenanceID
+            ].toJSON();
         }
         return result;
     }
@@ -184,9 +227,11 @@ class UptimeKumaServer {
      * @returns {Promise<void>}
      */
     async loadMaintenanceList(userID) {
-        let maintenanceList = await R.findAll("maintenance", " ORDER BY end_date DESC, title", [
-
-        ]);
+        let maintenanceList = await R.findAll(
+            "maintenance",
+            " ORDER BY end_date DESC, title",
+            []
+        );
 
         for (let maintenance of maintenanceList) {
             this.maintenanceList[maintenance.id] = maintenance;
@@ -207,9 +252,12 @@ class UptimeKumaServer {
      * @param {boolean} outputToConsole Should the error also be output to console?
      */
     static errorLog(error, outputToConsole = true) {
-        const errorLogStream = fs.createWriteStream(Database.dataDir + "/error.log", {
-            flags: "a"
-        });
+        const errorLogStream = fs.createWriteStream(
+            Database.dataDir + "/error.log",
+            {
+                flags: "a",
+            }
+        );
 
         errorLogStream.on("error", () => {
             log.info("", "Cannot write to error.log");
@@ -240,11 +288,16 @@ class UptimeKumaServer {
         }
 
         if (await Settings.get("trustProxy")) {
-            const forwardedFor = socket.client.conn.request.headers["x-forwarded-for"];
+            const forwardedFor =
+                socket.client.conn.request.headers["x-forwarded-for"];
 
-            return (typeof forwardedFor === "string" ? forwardedFor.split(",")[0].trim() : null)
-                || socket.client.conn.request.headers["x-real-ip"]
-                || clientIP.replace(/^.*:/, "");
+            return (
+                (typeof forwardedFor === "string"
+                    ? forwardedFor.split(",")[0].trim()
+                    : null) ||
+                socket.client.conn.request.headers["x-real-ip"] ||
+                clientIP.replace(/^.*:/, "")
+            );
         } else {
             return clientIP.replace(/^.*:/, "");
         }
@@ -286,9 +339,7 @@ class UptimeKumaServer {
     }
 
     /** Stop the server */
-    async stop() {
-
-    }
+    async stop() {}
 
     loadPlugins() {
         this.pluginsManager = new PluginsManager(this);
@@ -322,17 +373,18 @@ class UptimeKumaServer {
      * @param {MonitorType} monitorType
      */
     removeMonitorType(monitorType) {
-        if (UptimeKumaServer.monitorTypeList[monitorType.name] === monitorType) {
+        if (
+            UptimeKumaServer.monitorTypeList[monitorType.name] === monitorType
+        ) {
             delete UptimeKumaServer.monitorTypeList[monitorType.name];
         } else {
             log.error("", "Remove MonitorType failed: " + monitorType.name);
         }
     }
-
 }
 
 module.exports = {
-    UptimeKumaServer
+    UptimeKumaServer,
 };
 
 // Must be at the end

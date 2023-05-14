@@ -17,21 +17,15 @@
                     :href="monitor.url"
                     target="_blank"
                     rel="noopener noreferrer"
-                    >{{ monitor.url }}</a
-                >
-                <span v-if="monitor.type === 'port'"
-                    >TCP Port {{ monitor.hostname }}:{{ monitor.port }}</span
-                >
-                <span v-if="monitor.type === 'ping'"
-                    >Ping: {{ monitor.hostname }}</span
-                >
+                >{{ monitor.url }}</a>
+                <span v-if="monitor.type === 'port'">TCP Port {{ monitor.hostname }}:{{ monitor.port }}</span>
+                <span v-if="monitor.type === 'ping'">Ping: {{ monitor.hostname }}</span>
                 <span v-if="monitor.type === 'keyword'">
                     <br />
                     <span>{{ $t("Keyword") }}:</span>
                     <span class="keyword">{{ monitor.keyword }}</span>
                 </span>
-                <span v-if="monitor.type === 'dns'"
-                    >[{{ monitor.dns_resolve_type }}] {{ monitor.hostname }}
+                <span v-if="monitor.type === 'dns'">[{{ monitor.dns_resolve_type }}] {{ monitor.hostname }}
                     <br />
                     <span>{{ $t("Last Result") }}:</span>
                     <span class="keyword">{{ monitor.dns_last_result }}</span>
@@ -115,6 +109,12 @@
                         <PingChart :monitor-id="monitor.id" />
                     </div>
                 </div>
+            </div>
+
+            <div>
+                <AddonList
+                    :addonList="$root.addOnList[$route.params.id]"
+                ></AddonList>
             </div>
 
             <div class="shadow-box table-shadow-box">
@@ -245,6 +245,7 @@ import Tag from "../components/Tag.vue";
 import CertificateInfo from "../components/CertificateInfo.vue";
 import HAStatus from "../components/HomateComponents/HAStatus.vue";
 import HASUsage from "../components/HomateComponents/HAUsage.vue";
+import AddonList from "../components/HomateComponents/AddonList.vue";
 
 export default {
     components: {
@@ -257,6 +258,7 @@ export default {
         CertificateInfo,
         HAStatus,
         HASUsage,
+        AddonList,
     },
     data() {
         return {

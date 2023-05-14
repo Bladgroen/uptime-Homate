@@ -17,7 +17,7 @@ require("dotenv").config();
 //import custom api calls
 const {
     getAddOns,
-    updateAddOns,
+    deleteAddOns,
     createAddons,
 } = require("./HomateLogic/HomateServerIntegration.ts");
 
@@ -844,7 +844,7 @@ let needSetup = false;
 
                 await R.store(bean);
 
-                await updateAddOns(bean.url, bean.id);
+                await deleteAddOns(bean.id);
                 await createAddons(bean.id, bean.url);
 
                 await updateMonitorNotification(
@@ -1005,6 +1005,8 @@ let needSetup = false;
                     "DELETE FROM monitor WHERE id = ? AND user_id = ? ",
                     [monitorID, socket.userID]
                 );
+
+                await deleteAddOns(monitorID);
 
                 // Fix #2880
                 apicache.clear();
