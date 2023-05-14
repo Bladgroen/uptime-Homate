@@ -15,7 +15,11 @@ dayjs.extend(require("dayjs/plugin/customParseFormat"));
 require("dotenv").config();
 
 //import custom api calls
-const { getAddOns } = require("./HomateLogic/StatusMonitor.ts");
+const {
+    getAddOns,
+    updateAddOns,
+    createAddons,
+} = require("./HomateLogic/HomateServerIntegration.ts");
 
 // Check Node.js Version
 const nodeVersion = parseInt(process.versions.node.split(".")[0]);
@@ -735,7 +739,6 @@ let needSetup = false;
                 bean.validate();
                 await R.store(bean);
 
-                await createAddons(bean.id, monitor.url);
                 await updateMonitorNotification(bean.id, notificationIDList);
 
                 await server.sendMonitorList(socket);
@@ -745,6 +748,8 @@ let needSetup = false;
                     "monitor",
                     `Added Monitor: ${monitor.id} User ID: ${socket.userID}`
                 );
+
+                await createAddons(bean.id, monitor.url);
 
                 callback({
                     ok: true,
@@ -763,25 +768,6 @@ let needSetup = false;
                 });
             }
         });
-
-        async function createAddons(monitorID, monitorURL) {
-            const addOn = await getAddOns(monitorURL);
-            addOn.forEach(async (addOn) => {
-                const addon = {
-                    name: addOn.name,
-                    active: addOn.state === "started",
-                    slug: addOn.slug,
-                    url: addOn.url,
-                    version: addOn.version,
-                    update_available: addOn.update_available,
-                    icon: addOn.icon,
-                    monitor_id: monitorID,
-                };
-                let addonDB = R.dispense("add_ons");
-                addonDB.import(addon);
-                await R.store(addonDB);
-            });
-        }
 
         // Edit monitor
         socket.on("editMonitor", async (monitor, callback) => {
@@ -857,6 +843,9 @@ let needSetup = false;
                 bean.validate();
 
                 await R.store(bean);
+
+                await updateAddOns(bean.url, bean.id);
+                await createAddons(bean.id, bean.url);
 
                 await updateMonitorNotification(
                     bean.id,
