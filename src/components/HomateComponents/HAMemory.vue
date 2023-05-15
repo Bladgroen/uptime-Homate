@@ -1,13 +1,13 @@
 <template>
     <div class="StatusSymbol">
-        <p>{{ cpuUsage }}%</p>
+        <p>{{ memoryUsage }}%</p>
     </div>
 </template>
 
 <script>
 export default {
     props: {
-        cpuUsage: {
+        memoryUsage: {
             type: Number,
         },
     },

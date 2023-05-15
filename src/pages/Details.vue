@@ -17,21 +17,26 @@
                     :href="monitor.url"
                     target="_blank"
                     rel="noopener noreferrer"
-                >{{ monitor.url }}</a>
-                <span v-if="monitor.type === 'port'">TCP Port {{ monitor.hostname }}:{{ monitor.port }}</span>
-                <span v-if="monitor.type === 'ping'">Ping: {{ monitor.hostname }}</span>
+                    >{{ monitor.url }}</a
+                >
+                <span v-if="monitor.type === 'port'"
+                    >TCP Port {{ monitor.hostname }}:{{ monitor.port }}</span
+                >
+                <span v-if="monitor.type === 'ping'"
+                    >Ping: {{ monitor.hostname }}</span
+                >
                 <span v-if="monitor.type === 'keyword'">
                     <br />
                     <span>{{ $t("Keyword") }}:</span>
                     <span class="keyword">{{ monitor.keyword }}</span>
                 </span>
-                <span v-if="monitor.type === 'dns'">[{{ monitor.dns_resolve_type }}] {{ monitor.hostname }}
+                <span v-if="monitor.type === 'dns'"
+                    >[{{ monitor.dns_resolve_type }}] {{ monitor.hostname }}
                     <br />
                     <span>{{ $t("Last Result") }}:</span>
                     <span class="keyword">{{ monitor.dns_last_result }}</span>
                 </span>
             </p>
-            <p>{{ monitor.url }}</p>
             <div class="functions">
                 <div class="btn-group" role="group">
                     <button
@@ -74,11 +79,14 @@
                 </div>
                 <div class="row">
                     <p class="uptime__title">CPU</p>
-                    <HASUsage title="CPU"></HASUsage>
+                    <HASUsage title="CPU" :cpuUsage="cpuUsage"></HASUsage>
                 </div>
                 <div class="row">
                     <p class="uptime__title">Memory</p>
-                    <HASUsage title="Memory"></HASUsage>
+                    <HAMemory
+                        title="memory"
+                        :memoryUsage="memoryUsage"
+                    ></HAMemory>
                 </div>
             </div>
 
@@ -246,6 +254,7 @@ import CertificateInfo from "../components/CertificateInfo.vue";
 import HAStatus from "../components/HomateComponents/HAStatus.vue";
 import HASUsage from "../components/HomateComponents/HAUsage.vue";
 import AddonList from "../components/HomateComponents/AddonList.vue";
+import HAMemory from "../components/HomateComponents/HAMemory.vue";
 
 export default {
     components: {
@@ -259,6 +268,7 @@ export default {
         HAStatus,
         HASUsage,
         AddonList,
+        HAMemory,
     },
     data() {
         return {
@@ -271,6 +281,9 @@ export default {
                 hideCount: true,
                 chunksNavigation: "scroll",
             },
+            cpuUsage: null,
+            memoryUsage: null,
+            monitorURL: this.$root.monitorList[this.$route.params.id],
         };
     },
     computed: {
@@ -355,6 +368,15 @@ export default {
         },
     },
     mounted() {},
+    created() {
+        this.$root.getSocket().emit("getUsage", this.monitorURL);
+
+        this.$root.getSocket().on("usageData", (data) => {
+            let { cpuUsage, memoryUsage } = data;
+            this.cpuUsage = cpuUsage;
+            this.memoryUsage = memoryUsage;
+        });
+    },
     methods: {
         /** Request a test notification be sent for this monitor */
         testNotification() {

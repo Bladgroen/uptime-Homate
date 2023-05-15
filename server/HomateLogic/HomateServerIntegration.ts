@@ -89,4 +89,26 @@ async function updateAddOns(slug, monitorURL, addonID) {
     }
 }
 
-module.exports = { getAddOns, deleteAddOns, createAddons, updateAddOns };
+async function getUsage(monitorURL) {
+    try {
+        let response = await axios.get(
+            monitorURL.url + "/api/hassio/core/stats",
+            config
+        );
+        let usage = {
+            cpu_percent: response.data.data.cpu_percent,
+            memory_percent: response.data.data.memory_percent,
+        };
+        return usage;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+module.exports = {
+    getAddOns,
+    deleteAddOns,
+    createAddons,
+    updateAddOns,
+    getUsage,
+};

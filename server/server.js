@@ -19,6 +19,7 @@ const {
     updateAddOns,
     deleteAddOns,
     createAddons,
+    getUsage,
 } = require("./HomateLogic/HomateServerIntegration.ts");
 
 // Check Node.js Version
@@ -193,6 +194,7 @@ const { Settings } = require("./settings");
 const { CacheableDnsHttpAgent } = require("./cacheable-dns-http-agent");
 const { pluginsHandler } = require("./socket-handlers/plugins-handler");
 const apicache = require("./modules/apicache");
+const axios = require("axios");
 
 app.use(express.json());
 
@@ -330,6 +332,35 @@ let needSetup = false;
             log.info("server", "Redirect to setup page");
             socket.emit("setup");
         }
+
+        let intervalId = null;
+
+        socket.on("getUsage", async (monitorURL) => {
+            //clear previous interval
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+            let usage = await getUsage(monitorURL);
+
+            let cpuUsage = usage.cpu_percent;
+
+            let memoryUsage = usage.memory_percent;
+            socket.emit("usageData", { cpuUsage, memoryUsage });
+
+            intervalId = setInterval(async () => {
+                let usage = await getUsage(monitorURL);
+
+                let cpuUsage = usage.cpu_percent;
+
+                let memoryUsage = usage.memory_percent;
+                socket.emit("usageData", { cpuUsage, memoryUsage });
+            }, 1000);
+
+            socket.on("disconnect", () => {
+                clearInterval(intervalId);
+            });
+        });
 
         // ***************************
         // Public Socket API

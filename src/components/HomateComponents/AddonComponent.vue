@@ -6,8 +6,12 @@
             <p>{{ name }}</p>
         </div>
         <div class="addon__status"></div>
-        <div v-if="updateAvailable === 0" class="addon__update">
-            <AddonUpdateButton :slug="slug" :name="name" :id="id"></AddonUpdateButton>
+        <div v-if="updateAvailable === 1" class="addon__update">
+            <AddonUpdateButton
+                :id="id"
+                :slug="slug"
+                :name="name"
+            ></AddonUpdateButton>
         </div>
     </div>
 </template>
