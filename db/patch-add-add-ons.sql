@@ -8,7 +8,6 @@ CREATE TABLE add_ons (
     slug VARCHAR(255),
     URL TEXT,
     accepted_statuscodes_json TEXT NOT NULL DEFAULT '["200-299]',
-    version VARCHAR(50),
     update_available BOOLEAN NOT NULL,
     icon VARCHAR(255),
     monitor_id INTEGER NOT NULL,

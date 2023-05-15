@@ -2,7 +2,6 @@
     <div class="update" @click="openModal">
         <font-awesome-icon icon="arrow-alt-circle-up" class="update__icon" />
         <p class="update__text">Nieuwe update!</p>
-        <p>{{ $root.monitorList[41].name }}</p>
     </div>
     <div v-if="isModalOpen" ref="modal" class="modal">
         <h2>Wil je {{ name }} updaten?</h2>
@@ -14,7 +13,6 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
     props: {
         slug: {
@@ -56,15 +54,16 @@ export default {
                     "updateAddon",
                     this.addonSlug,
                     this.monitorURL,
-                    this.addonID
+                    this.addonID,
+                    (res) => {
+                        console.log(res);
+                        this.$root.toastRes(res);
+                    }
                 );
-
-
         },
         cancel() {
             this.isModalOpen = false;
             document.removeEventListener("mousedown", this.handleClickOutside);
-            console.log("cancel ingedrukt");
         },
         handleClickOutside(event) {
             if (this.$refs.modal && !this.$refs.modal.contains(event.target)) {

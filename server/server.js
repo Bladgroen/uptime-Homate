@@ -774,11 +774,20 @@ let needSetup = false;
             async (addonSlug, monitorURL, addonID, callback) => {
                 try {
                     checkLogin(socket);
-                    updateAddOns(addonSlug, monitorURL, addonID);
+                    await updateAddOns(addonSlug, monitorURL, addonID);
 
                     log.info("Addon", `Updated addon: ${addonSlug}`);
+
+                    callback({
+                        ok: true,
+                        msg: "addon geupdate.",
+                    });
                 } catch (e) {
                     log.error("Addon", `Error updating addon: ${addonSlug}`);
+                    callback({
+                        ok: false,
+                        msg: e.message,
+                    });
                 }
             }
         );

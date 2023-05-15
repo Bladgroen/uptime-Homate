@@ -16,20 +16,11 @@ async function getAddOns(monitorURL) {
         const apiURL = monitorURL + "/api/hassio/addons";
 
         const response = await axios.get(apiURL, config);
-        const response2 = await axios.post(
-            "https://debugcontroller.homate.ml/api/hassio/core/restart",
-            config
-        );
-        console.log(
-            "🚀 ~ file: HomateServerIntegration.ts:20 ~ getAddOns ~ response2:",
-            response2
-        );
 
         const filteredAddons = response.data.data.addons.map((addon) => {
             return {
                 name: addon.name,
                 slug: addon.slug,
-                version: addon.version,
                 update_available: addon.update_available,
                 state: addon.state,
                 url: apiURL + "/" + addon.slug + "/stats",
@@ -52,7 +43,6 @@ async function createAddons(monitorID, monitorURL) {
                 active: addOn.state === "started",
                 slug: addOn.slug,
                 url: addOn.url,
-                version: addOn.version,
                 update_available: addOn.update_available,
                 icon: addOn.icon,
                 monitor_id: monitorID,
@@ -74,36 +64,28 @@ async function deleteAddOns(monitorID) {
     }
 }
 
+const bearer =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzYWE4YTAwMzQwOWM0YzM5YTAzYjJlZDE0OTJiZTJlNCIsImlhdCI6MTY4MzAzMzQ0NiwiZXhwIjoxOTk4MzkzNDQ2fQ._WqcQa21z3osFhZBYSveaPXiuLFGb6E-4FQFlpp71eM";
+
 async function updateAddOns(slug, monitorURL, addonID) {
+    const options = {
+        method: "POST",
+        url: monitorURL.url + "/api/hassio/store/addons/" + slug + "/update",
+        headers: {
+            Authorization: "Bearer " + bearer,
+            "Content-Type": "application/json",
+        },
+    };
     try {
-        const options = {
-            method: "POST",
-            url: "https://debugcontroller.homate.ml/api/hassio/store/addons/core_ssh/update",
-            headers: {
-                Authorization:
-                    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzYWE4YTAwMzQwOWM0YzM5YTAzYjJlZDE0OTJiZTJlNCIsImlhdCI6MTY4MzAzMzQ0NiwiZXhwIjoxOTk4MzkzNDQ2fQ._WqcQa21z3osFhZBYSveaPXiuLFGb6E-4FQFlpp71eM",
-                "Content-Type": "application/json",
-            },
-        };
-
-        await axios
-            .request(options)
-            .then(function (response) {
-                console.log(response.data);
-            })
-            .catch(function (error) {
-                console.error(error);
-            });
-
-        // if (response.status === 200) {
-        //     let addonDB = await R.find("add_ons", addonID);
-        //     addonDB.update_available = 0;
-        //     await R.store(addonDB);
-        // } else {
-        //     throw new Error(response.message);
-        // }
+        await axios.request(options);
+        let addonDB = await R.find("add_ons", "monitor_id = ? AND slug = ?", [
+            addonID,
+            slug,
+        ]);
+        addonDB.update_available = 0;
+        await R.store(addonDB);
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 
