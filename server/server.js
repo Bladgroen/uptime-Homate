@@ -16,7 +16,7 @@ require("dotenv").config();
 
 //import custom api calls
 const {
-    getAddOns,
+    updateAddOns,
     deleteAddOns,
     createAddons,
 } = require("./HomateLogic/HomateServerIntegration.ts");
@@ -768,6 +768,20 @@ let needSetup = false;
                 });
             }
         });
+
+        socket.on(
+            "updateAddon",
+            async (addonSlug, monitorURL, addonID, callback) => {
+                try {
+                    checkLogin(socket);
+                    updateAddOns(addonSlug, monitorURL, addonID);
+
+                    log.info("Addon", `Updated addon: ${addonSlug}`);
+                } catch (e) {
+                    log.error("Addon", `Error updating addon: ${addonSlug}`);
+                }
+            }
+        );
 
         // Edit monitor
         socket.on("editMonitor", async (monitor, callback) => {

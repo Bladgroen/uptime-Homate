@@ -137,10 +137,6 @@ class UptimeKumaServer {
     async sendMonitorList(socket) {
         let list = await this.getMonitorJSONList(socket.userID);
         let addon = await this.getAddOnsList();
-        console.log(
-            "🚀 ~ file: uptime-kuma-server.js:140 ~ UptimeKumaServer ~ sendMonitorList ~ list2:",
-            addon
-        );
         this.io.to(socket.userID).emit("monitorList", list);
         this.io.to(socket.userID).emit("addOnsList", addon);
 

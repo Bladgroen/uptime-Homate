@@ -1,7 +1,12 @@
 <template>
     <div v-for="addon in addonList" :key="addon._id">
-        <AddonComponent :img="addon._icon" :name="addon._name"></AddonComponent>
-        <p>{{ addon._icon }}</p>
+        <AddonComponent
+            :id="addon._id"
+            :img="addon._icon"
+            :name="addon._name"
+            :updateAvailable="addon._updateAvailable"
+            :slug="addon._slug"
+        ></AddonComponent>
     </div>
 </template>
 <script>
