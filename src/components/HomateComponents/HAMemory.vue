@@ -9,6 +9,7 @@ export default {
     props: {
         memoryUsage: {
             type: Number,
+            default: 0
         },
     },
 };

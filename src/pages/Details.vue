@@ -284,6 +284,7 @@ export default {
             cpuUsage: null,
             memoryUsage: null,
             monitorURL: this.$root.monitorList[this.$route.params.id],
+            varFromRoute: null,
         };
     },
     computed: {
@@ -367,21 +368,30 @@ export default {
             return this.heartBeatList.slice(startIndex, endIndex);
         },
     },
-    mounted() {},
-    created() {
-        this.$root.getSocket().emit("getUsage", this.monitorURL);
 
-        this.$root.getSocket().on("usageData", (data) => {
-            let { cpuUsage, memoryUsage } = data;
-            this.cpuUsage = cpuUsage;
-            this.memoryUsage = memoryUsage;
-        });
+    beforeMount() {},
+    created() {},
+
+    mounted() {
+        this.getUsageData();
     },
+
+    beforeUnmount() {},
     methods: {
         /** Request a test notification be sent for this monitor */
         testNotification() {
             this.$root.getSocket().emit("testNotification", this.monitor.id);
             toast.success("Test notification is requested.");
+        },
+
+        getUsageData() {
+            this.$root.getSocket().emit("getUsage", this.$route.params.id);
+
+            this.$root.getSocket().on("usageData", (data) => {
+                let { cpuUsage, memoryUsage } = data;
+                this.cpuUsage = cpuUsage;
+                this.memoryUsage = memoryUsage;
+            });
         },
 
         /** Show dialog to confirm pause */

@@ -335,13 +335,13 @@ let needSetup = false;
 
         let intervalId = null;
 
-        socket.on("getUsage", async (monitorURL) => {
+        socket.on("getUsage", async (monitorID) => {
             //clear previous interval
             if (intervalId) {
                 clearInterval(intervalId);
                 intervalId = null;
             }
-            let usage = await getUsage(monitorURL);
+            let usage = await getUsage(monitorID);
 
             let cpuUsage = usage.cpu_percent;
 

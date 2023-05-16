@@ -1,6 +1,5 @@
 <template>
     <div class="StatusSymbol">
-
         <div
             v-if="shortBeatList"
             class="StatusSymbol__icon"
@@ -63,8 +62,6 @@ export default {
                 return null;
             }
 
-            console.log("beatlist" + JSON.stringify(latestBeat));
-            console.log(latestBeat.status);
             return latestBeat;
         },
     },

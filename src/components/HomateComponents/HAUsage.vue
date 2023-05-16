@@ -9,6 +9,7 @@ export default {
     props: {
         cpuUsage: {
             type: Number,
+            default: 0,
         },
     },
 };

@@ -89,12 +89,15 @@ async function updateAddOns(slug, monitorURL, addonID) {
     }
 }
 
-async function getUsage(monitorURL) {
+async function getUsage(monitorID) {
     try {
+        let bean = await R.findOne("monitor", "id = ?", [monitorID]);
+
         let response = await axios.get(
-            monitorURL.url + "/api/hassio/core/stats",
+            bean._url + "/api/hassio/core/stats",
             config
         );
+
         let usage = {
             cpu_percent: response.data.data.cpu_percent,
             memory_percent: response.data.data.memory_percent,
