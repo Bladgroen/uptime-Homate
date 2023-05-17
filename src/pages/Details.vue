@@ -37,6 +37,7 @@
                     <span class="keyword">{{ monitor.dns_last_result }}</span>
                 </span>
             </p>
+            <CoreUpdateButton></CoreUpdateButton>
             <div class="functions">
                 <div class="btn-group" role="group">
                     <button
@@ -79,7 +80,7 @@
                 </div>
                 <div class="row">
                     <p class="uptime__title">CPU</p>
-                    <HASUsage title="CPU" :cpuUsage="cpuUsage"></HASUsage>
+                    <HASUsage :cpuUsage="cpuUsage"></HASUsage>
                 </div>
                 <div class="row">
                     <p class="uptime__title">Memory</p>
@@ -255,6 +256,7 @@ import HAStatus from "../components/HomateComponents/HAStatus.vue";
 import HASUsage from "../components/HomateComponents/HAUsage.vue";
 import AddonList from "../components/HomateComponents/AddonList.vue";
 import HAMemory from "../components/HomateComponents/HAMemory.vue";
+import CoreUpdateButton from "../components/HomateComponents/CoreUpdateButton.vue";
 
 export default {
     components: {
@@ -269,6 +271,7 @@ export default {
         HASUsage,
         AddonList,
         HAMemory,
+        CoreUpdateButton,
     },
     data() {
         return {

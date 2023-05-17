@@ -107,7 +107,7 @@ async function getUsage(monitorID) {
     }
 }
 
-async function getAddOnHeartbeat() {
+async function createAddOnHeartbeat() {
     try {
         let bean = await R.find("monitor", "active = ?", [1]);
         bean.forEach(async (monitor) => {
@@ -147,6 +147,32 @@ async function getAddOnHeartbeat() {
     } catch (error) {
         console.error(error);
     }
+
+    async function getAddOnHeartbeat() {
+        try {
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function updateCore(monitorURL) {
+        const options = {
+            methods: "POST",
+            url: monitorURL.url + "/api/hassio/core/update",
+            headers: {
+                Authorization: "Bearer " + bearer,
+                "Content-Type": "application/json",
+            },
+        };
+        try {
+            //const checkUpdate = await axios.get(monitorURL.url + "/api/hassio/core/info");
+
+            await axios.request(options);
+            
+        } catch (error) {
+            console.error(error);
+        }
+    }
 }
 
 module.exports = {
@@ -155,5 +181,5 @@ module.exports = {
     createAddons,
     updateAddOns,
     getUsage,
-    getAddOnHeartbeat,
+    createAddOnHeartbeat,
 };
