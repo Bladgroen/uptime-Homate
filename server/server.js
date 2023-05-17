@@ -20,6 +20,7 @@ const {
     deleteAddOns,
     createAddons,
     getUsage,
+    getAddOnHeartbeat,
 } = require("./HomateLogic/HomateServerIntegration.ts");
 
 // Check Node.js Version
@@ -774,6 +775,7 @@ let needSetup = false;
 
                 await server.sendMonitorList(socket);
                 await startMonitor(socket.userID, bean.id);
+                await getAddOnHeartbeat();
 
                 log.info(
                     "monitor",

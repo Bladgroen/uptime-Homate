@@ -122,9 +122,26 @@ async function getAddOnHeartbeat() {
                     "monitor_id = ? AND slug = ?",
                     [monitor.id, addon.slug]
                 );
-                addonDB.active = addon.state === "started";
-                addonDB.update_available = addon.update_available;
-                await R.store(addonDB);
+
+                if (addonDB) {
+                    addonDB.active = addon.state === "started";
+
+                    addonDB.update_available = addon.update_available;
+                    console.log(
+                        "🚀 ~ file: HomateServerIntegration.ts:127 ~ addons.forEach ~ addon.state: ER IS EEN ADDONDB "
+                    );
+                    //await R.store(addonDB);
+                    const status = {
+                        monitor_id: monitor._id,
+                        add_on_id: addonDB.id,
+                        status: addon.state === "started" ? 1 : 0,
+                        msg: addon.state,
+                        time: new Date(),
+                    };
+                    let statusDB = R.dispense("add_on_heartbeat");
+                    statusDB.import(status);
+                    await R.store(statusDB);
+                }
             });
         });
     } catch (error) {
@@ -138,4 +155,5 @@ module.exports = {
     createAddons,
     updateAddOns,
     getUsage,
+    getAddOnHeartbeat,
 };

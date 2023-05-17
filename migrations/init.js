@@ -414,9 +414,9 @@ exports.up = function (knex) {
             knex.schema.createTable("add_on_heartbeat", function (table) {
                 table.increments("id").primary();
                 table.integer("monitor_id").notNullable().unsigned();
-                table.intereger("add_on_id").notNullable().unsigned();
-                table.smallint("status").notNullable();
+                table.integer("add_on_id").notNullable().unsigned();
                 table.text("msg");
+                table.smallint("status").notNullable();
                 table.datetime("time").notNullable();
 
                 table
@@ -429,7 +429,7 @@ exports.up = function (knex) {
                     .references("add_ons.id")
                     .onDelete("CASCADE")
                     .onUpdate("CASCADE");
-                table.index(["add_on", "time"], "add_on_time_index");
+                table.index(["add_on_id", "time"], "add_on_time_index");
                 table.index(["monitor_id"]);
                 table.index(["add_on_id"]);
             })
