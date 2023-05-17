@@ -349,7 +349,7 @@ let needSetup = false;
             socket.emit("usageData", { cpuUsage, memoryUsage });
 
             intervalId = setInterval(async () => {
-                let usage = await getUsage(monitorURL);
+                let usage = await getUsage(monitorID);
 
                 let cpuUsage = usage.cpu_percent;
 

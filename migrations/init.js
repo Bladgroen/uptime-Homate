@@ -140,6 +140,7 @@ exports.up = function (knex) {
                     .references("user.id")
                     .onDelete("SET NULL")
                     .onUpdate("CASCADE");
+                table.index(["id"]);
             })
         )
         .then(() =>
@@ -276,6 +277,14 @@ exports.up = function (knex) {
                     .references("monitor.id")
                     .onDelete("CASCADE")
                     .onUpdate("CASCADE");
+
+                table.index(["monitor_id", "time"], "monitor_time_index");
+                table.index(
+                    ["monitor_id", "important", "time"],
+                    "monitor_important_time_index"
+                );
+                table.index(["monitor_id"]);
+                table.index(["important"]);
             })
         )
         .then(() =>
@@ -294,6 +303,8 @@ exports.up = function (knex) {
                     .references("notification.id")
                     .onDelete("CASCADE")
                     .onUpdate("CASCADE");
+
+                table.index(["monitor_id", "notification_id"]);
             })
         )
         .then(() =>
@@ -314,6 +325,8 @@ exports.up = function (knex) {
                     .references("monitor.id")
                     .onDelete("CASCADE")
                     .onUpdate("CASCADE");
+
+                table.index(["monitor_id", "group_id"]);
             })
         )
         .then(() =>
@@ -333,6 +346,9 @@ exports.up = function (knex) {
                     .references("monitor.id")
                     .onDelete("CASCADE")
                     .onUpdate("CASCADE");
+
+                table.index(["monitor_id"]);
+                table.index(["tag_id"]);
             })
         )
         .then(() =>
@@ -360,10 +376,6 @@ exports.up = function (knex) {
                 table.boolean("active").notNullable().defaultTo(1);
                 table.string("slug", 255);
                 table.text("URL");
-                table
-                    .text("accepted_statuscodes_json")
-                    .notNullable()
-                    .defaultTo('["200-299"]');
                 table.boolean("update_available").notNullable();
                 table.string("icon", 255);
                 table.integer("monitor_id").notNullable().unsigned();
@@ -373,6 +385,8 @@ exports.up = function (knex) {
                     .references("monitor.id")
                     .onDelete("CASCADE")
                     .onUpdate("CASCADE");
+                table.index(["monitor_id"]);
+                table.index(["id"]);
             })
         )
 
@@ -394,6 +408,30 @@ exports.up = function (knex) {
                     .references("user.id")
                     .onDelete("CASCADE")
                     .onUpdate("CASCADE");
+            })
+        )
+        .then(() =>
+            knex.schema.createTable("add_on_heartbeat", function (table) {
+                table.increments("id").primary();
+                table.integer("monitor_id").notNullable().unsigned();
+                table.intereger("add_on_id").notNullable().unsigned();
+                table.smallint("status").notNullable();
+                table.text("msg");
+                table.datetime("time").notNullable();
+
+                table
+                    .foreign("monitor_id")
+                    .references("monitor.id")
+                    .onDelete("CASCADE")
+                    .onUpdate("CASCADE");
+                table
+                    .foreign("add_on_id")
+                    .references("add_ons.id")
+                    .onDelete("CASCADE")
+                    .onUpdate("CASCADE");
+                table.index(["add_on", "time"], "add_on_time_index");
+                table.index(["monitor_id"]);
+                table.index(["add_on_id"]);
             })
         );
 };
@@ -419,5 +457,6 @@ exports.down = function (knex) {
         .then(() => knex.schema.dropTable("maintenance_status_page"))
         .then(() => knex.schema.dropTable("sqlite_sequence"))
         .then(() => knex.schema.dropTable("status_page"))
-        .then(() => knex.schema.dropTable("status_page_cname"));
+        .then(() => knex.schema.dropTable("status_page_cname"))
+        .then(() => knex.schema.dropTable("add_on_heartbeat"));
 };

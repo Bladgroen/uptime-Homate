@@ -40,13 +40,11 @@ async function createAddons(monitorID, monitorURL) {
         addOn.forEach(async (addOn) => {
             const addon = {
                 name: addOn.name,
-                active: addOn.state === "started",
                 slug: addOn.slug,
                 url: addOn.url,
                 update_available: addOn.update_available,
                 icon: addOn.icon,
                 monitor_id: monitorID,
-                accepted_statuscodes_json: '["200-299"]',
             };
             let addonDB = R.dispense("add_ons");
             addonDB.import(addon);
@@ -104,6 +102,31 @@ async function getUsage(monitorID) {
             memory_percent: response.data.data.memory_percent,
         };
         return usage;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function getAddOnHeartbeat() {
+    try {
+        let bean = await R.find("monitor", "active = ?", [1]);
+        bean.forEach(async (monitor) => {
+            let response = await axios.get(
+                monitor._url + "/api/hassio/addons",
+                config
+            );
+            let addons = response.data.data.addons;
+            addons.forEach(async (addon) => {
+                let addonDB = await R.findOne(
+                    "add_ons",
+                    "monitor_id = ? AND slug = ?",
+                    [monitor.id, addon.slug]
+                );
+                addonDB.active = addon.state === "started";
+                addonDB.update_available = addon.update_available;
+                await R.store(addonDB);
+            });
+        });
     } catch (error) {
         console.error(error);
     }

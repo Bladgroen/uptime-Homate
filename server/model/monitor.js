@@ -1311,6 +1311,7 @@ class Monitor extends BeanModel {
             .where("time", ">", startTime)
             .whereNotNull("ping")
             .andWhere({ monitor_id: monitorID })
+            .groupBy("time", "duration")
             .orderBy("time", "asc")
             .limit(1);
 
