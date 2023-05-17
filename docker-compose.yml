@@ -1,0 +1,13 @@
+# Simple docker-compose.yml
+# You can change your port or volume location
+version: "3"
+services:
+  myapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+      - 7070:7070
+    volumes:
+      - ./src:/app/src

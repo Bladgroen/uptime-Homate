@@ -46,6 +46,7 @@ async function createAddons(monitorID, monitorURL) {
                 update_available: addOn.update_available,
                 icon: addOn.icon,
                 monitor_id: monitorID,
+                accepted_statuscodes_json: '["200-299"]',
             };
             let addonDB = R.dispense("add_ons");
             addonDB.import(addon);

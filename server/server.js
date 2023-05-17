@@ -1899,17 +1899,17 @@ async function afterLogin(socket, user) {
  * @returns {Promise<void>}
  */
 async function initDatabase(testMode = false) {
-    if (!fs.existsSync(Database.path)) {
-        log.info("server", "Copying Database");
-        fs.copyFileSync(Database.templatePath, Database.path);
-    }
+    // if (!fs.existsSync(Database.path)) {
+    //     log.info("server", "Copying Database");
+    //     fs.copyFileSync(Database.templatePath, Database.path);
+    // }
 
     log.info("server", "Connecting to the Database");
     await Database.connect(testMode);
     log.info("server", "Connected");
 
     // Patch the database
-    await Database.patch();
+    //await Database.patch();
 
     let jwtSecretBean = await R.findOne("setting", " `key` = ? ", [
         "jwtSecret",
