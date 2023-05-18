@@ -44,11 +44,19 @@ export default {
             type: Number,
             required: true,
         },
+        heartbeatList: {
+            type: Object,
+            required: true,
+        },
     },
     data() {
         return {
             update: this.updateAvailable,
+            heartbeat: this.heartbeatList,
         };
+    },
+    mounted() {
+        // console.log(this.heartbeatList);
     },
     methods: {
         updateParentState(newValue) {

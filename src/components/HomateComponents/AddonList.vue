@@ -6,6 +6,7 @@
             :name="addon._name"
             :updateAvailable="addon._updateAvailable"
             :slug="addon._slug"
+            :heartBeatList="getFilteredHeartbeatList"
         ></AddonComponent>
     </div>
 </template>
@@ -18,6 +19,35 @@ export default {
         addonList: {
             type: Object,
             required: true,
+        },
+    },
+    data() {
+        return {
+            heartbeatList: {},
+        };
+    },
+    mounted() {
+        //this.getFilteredHeartbeatList();
+    },
+    methods: {
+        getAddonHeartbeat() {
+            this.$root.getSocket().emit("getAddonHeartbeat");
+
+            this.$root.getSocket().on("addonHeartbeat", (data) => {
+                this.heartbeatList = data;
+            });
+        },
+        getFilteredHeartbeatList() {
+            const filteredList = {};
+            const monitorID = this.$route.params.number;
+
+            for (const key in this.heartbeatList) {
+                if (key === monitorID) {
+                    filteredList[key] = this.heartbeatList[key];
+                }
+            }
+            console.log(filteredList);
+            return filteredList;
         },
     },
 };

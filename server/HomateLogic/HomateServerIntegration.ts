@@ -146,6 +146,34 @@ async function createAddOnHeartbeat() {
 }
 async function getAddOnHeartbeat() {
     try {
+        let addonHeartbeatList = await R.findAll("add_on_heartbeat");
+        let organizedData = {};
+
+        addonHeartbeatList.forEach((row) => {
+            const key = row.monitor_id.toString();
+            if (!organizedData[key]) {
+                organizedData[key] = [row]; // Initialize the value as an array
+            } else {
+                const existingAddOnIds = organizedData[key].map(
+                    (item) => item._addOnId
+                );
+                if (
+                    existingAddOnIds.filter((id) => id === row._addOnId)
+                        .length < 50
+                ) {
+                    organizedData[key].push(row); // Push the row into the existing array
+                } else {
+                    const firstIndex = organizedData[key].findIndex(
+                        (item) => item._addOnId === row._addOnId
+                    );
+                    if (firstIndex >= 0) {
+                        organizedData[key].splice(firstIndex, 1); // Remove the first occurrence of addOnId
+                        organizedData[key].push(row); // Push the new row at the end
+                    }
+                }
+            }
+        });
+        return organizedData;
     } catch (error) {
         console.error(error);
     }
@@ -252,5 +280,6 @@ module.exports = {
     pushToken,
     getToken,
     checkUpdateCore,
-    updateCore
+    updateCore,
+    getAddOnHeartbeat,
 };

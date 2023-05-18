@@ -11,6 +11,7 @@ const { CacheableDnsHttpAgent } = require("./cacheable-dns-http-agent");
 const { Settings } = require("./settings");
 const dayjs = require("dayjs");
 const { PluginsManager } = require("./plugins-manager");
+
 // DO NOT IMPORT HERE IF THE MODULES USED `UptimeKumaServer.getInstance()`
 
 /**
@@ -139,7 +140,6 @@ class UptimeKumaServer {
         let addon = await this.getAddOnsList();
         this.io.to(socket.userID).emit("monitorList", list);
         this.io.to(socket.userID).emit("addOnsList", addon);
-
         return list;
     }
 

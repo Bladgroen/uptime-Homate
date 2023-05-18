@@ -37,7 +37,6 @@ export default {
             addOnList: {},
             maintenanceList: {},
             apiKeyList: {},
-            test: "dit is een test",
             heartbeatList: {},
             importantHeartbeatList: {},
             avgPingList: {},
@@ -135,11 +134,8 @@ export default {
 
             socket.on("addOnsList", (data) => {
                 this.addOnList = data;
-                console.log(
-                    "🚀 ~ file: socket.js:137 ~ socket.on ~ data:",
-                    data
-                );
             });
+
 
             socket.on("maintenanceList", (data) => {
                 this.maintenanceList = data;

@@ -23,7 +23,8 @@ const {
     createAddOnHeartbeat,
     pushToken,
     checkUpdateCore,
-    updateCore
+    updateCore,
+    getAddOnHeartbeat,
 } = require("./HomateLogic/HomateServerIntegration.ts");
 
 // Check Node.js Version
@@ -363,6 +364,28 @@ let needSetup = false;
 
             socket.on("disconnect", () => {
                 clearInterval(intervalId);
+            });
+        });
+
+        let intervalAddon = null;
+
+        socket.on("getAddonHeartbeat", async () => {
+            if (intervalAddon) {
+                clearInterval(intervalAddon);
+                intervalAddon = null;
+            }
+            let list = await getAddOnHeartbeat();
+            await createAddOnHeartbeat();
+            socket.emit("addonHeartbeat", list);
+
+            intervalAddon = setInterval(async () => {
+                await createAddOnHeartbeat();
+                let list = await getAddOnHeartbeat();
+
+                socket.emit("addonHeartbeat", list);
+            }, 2000);
+            socket.on("disconnect", () => {
+                clearInterval(intervalAddon);
             });
         });
 
@@ -779,14 +802,13 @@ let needSetup = false;
 
                 await server.sendMonitorList(socket);
                 await startMonitor(socket.userID, bean.id);
-                await createAddOnHeartbeat();
 
                 log.info(
                     "monitor",
                     `Added Monitor: ${monitor.id} User ID: ${socket.userID}`
                 );
-
                 await createAddons(bean.id, monitor.url);
+                await createAddOnHeartbeat();
 
                 callback({
                     ok: true,
@@ -846,7 +868,7 @@ let needSetup = false;
             }
         );
 
-        socket.on("updateCore", async(monitorURL, monitorID, callback) => {
+        socket.on("updateCore", async (monitorURL, monitorID, callback) => {
             try {
                 checkLogin(socket);
                 await updateCore(monitorURL, monitorID);
@@ -856,15 +878,15 @@ let needSetup = false;
                 callback({
                     ok: true,
                     msg: "Core geupdate.",
-                })
-            } catch(error) {
+                });
+            } catch (error) {
                 log.error("Core", `Error updating core: ${monitorURL}`);
                 callback({
                     ok: false,
                     msg: error.message,
-                })
+                });
             }
-        }))
+        });
 
         // Edit monitor
         socket.on("editMonitor", async (monitor, callback) => {
@@ -1760,6 +1782,11 @@ let needSetup = false;
                 await R.exec("DELETE FROM heartbeat WHERE monitor_id = ?", [
                     monitorID,
                 ]);
+
+                await R.exec(
+                    "DELETE FROM add_on_heartbeat WHERE monitor_id = ?",
+                    [monitorID]
+                );
 
                 await sendHeartbeatList(socket, monitorID, true, true);
 
