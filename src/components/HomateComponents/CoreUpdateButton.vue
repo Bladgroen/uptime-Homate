@@ -15,11 +15,7 @@
 <script>
 export default {
     props: {
-        slug: {
-            type: String,
-            required: true,
-        },
-        name: {
+        url: {
             type: String,
             required: true,
         },
@@ -31,9 +27,8 @@ export default {
     data() {
         return {
             isModalOpen: false,
-            addonID: this.id,
+            monitorID: this.id,
             monitorURL: this.$root.monitorList[this.$route.params.id],
-            addonSlug: this.slug,
         };
     },
     beforeUnmount() {
@@ -47,19 +42,24 @@ export default {
         async next() {
             this.isModalOpen = false;
             document.removeEventListener("mousedown", this.handleClickOutside);
-            console.log("next ingedrukt");
-            this.$root
-                .getSocket()
-                .emit(
-                    "updateAddon",
-                    this.addonSlug,
-                    this.monitorURL,
-                    this.addonID,
-                    (res) => {
-                        console.log(res);
-                        this.$root.toastRes(res);
-                    }
-                );
+            try {
+                this.$root
+                    .getSocket()
+                    .emit(
+                        "updateCore",
+                        this.monitorURL,
+                        this.id,
+                        (res) => {
+                            console.log(res);
+                            this.$root.toastRes(res);
+                        }
+                    );
+                this.$root.monitorList[
+                    this.$route.params.id
+                ].update_available = false;
+            } catch (error) {
+                console.log(error);
+            }
         },
         cancel() {
             this.isModalOpen = false;

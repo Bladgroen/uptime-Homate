@@ -134,7 +134,10 @@ exports.up = function (knex) {
                 table.text("tls_ca").nullable();
                 table.text("tls_cert").nullable();
                 table.text("tls_key").nullable();
-                table.boolean("update_available").notNullable().defaultTo(0);
+                table
+                    .boolean("update_available")
+                    .notNullable()
+                    .defaultTo(false);
 
                 table
                     .foreign("user_id")

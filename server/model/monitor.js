@@ -3,6 +3,9 @@ const dayjs = require("dayjs");
 const axios = require("axios");
 const { Prometheus } = require("../prometheus");
 const {
+    checkUpdateCore,
+} = require("../HomateLogic/HomateServerIntegration.ts");
+const {
     log,
     UP,
     DOWN,
@@ -137,7 +140,7 @@ class Monitor extends BeanModel {
             radiusCallingStationId: this.radiusCallingStationId,
             game: this.game,
             httpBodyEncoding: this.httpBodyEncoding,
-            update_available: 0,
+            update_available: await checkUpdateCore(this.url),
         };
 
         if (includeSensitiveData) {
@@ -180,9 +183,6 @@ class Monitor extends BeanModel {
     }
 
     /** Check if monitor can be updated */
-    async checkUpdateAvailable() {
-        //const response = await axios.get()
-    }
 
     /**
      * Encode user and password to Base64 encoding

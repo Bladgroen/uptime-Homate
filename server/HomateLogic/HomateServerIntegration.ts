@@ -65,15 +65,12 @@ async function deleteAddOns(monitorID) {
     }
 }
 
-const bearer =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzYWE4YTAwMzQwOWM0YzM5YTAzYjJlZDE0OTJiZTJlNCIsImlhdCI6MTY4MzAzMzQ0NiwiZXhwIjoxOTk4MzkzNDQ2fQ._WqcQa21z3osFhZBYSveaPXiuLFGb6E-4FQFlpp71eM";
-
 async function updateAddOns(slug, monitorURL, addonID) {
     const options = {
         method: "POST",
         url: monitorURL.url + "/api/hassio/store/addons/" + slug + "/update",
         headers: {
-            Authorization: "Bearer " + await getToken(),
+            Authorization: "Bearer " + (await getToken()),
             "Content-Type": "application/json",
         },
     };
@@ -154,19 +151,36 @@ async function getAddOnHeartbeat() {
     }
 }
 
-async function updateCore(monitorURL) {
+async function updateCore(monitorURL, monitorID) {
     const options = {
         methods: "POST",
         url: monitorURL.url + "/api/hassio/core/update",
         headers: {
-            Authorization: "Bearer " + bearer,
+            Authorization: "Bearer " + (await getToken()),
             "Content-Type": "application/json",
         },
     };
     try {
-        //const checkUpdate = await axios.get(monitorURL.url + "/api/hassio/core/info");
-
         await axios.request(options);
+        let coreDB = await R.find("monitor", "id = ?", [monitorID]);
+        coreDB.update_available = false;
+        await R.store(coreDB);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function checkUpdateCore(monitorURL) {
+    try {
+        const response = await axios.get(
+            monitorURL + "/api/hassio/core/info",
+            await createConfig()
+        );
+        console.log(
+            "🚀 ~ file: HomateServerIntegration.ts:183 ~ checkUpdateCore ~ response.data.data.update_available:",
+            response.data.data.update_available
+        );
+        return response.data.data.update_available;
     } catch (error) {
         console.error(error);
     }
@@ -183,7 +197,6 @@ async function pushToken(token) {
         };
         tokenDB.import(bearerToken);
         await R.store(tokenDB);
-        console.log(await getToken());
     } catch (error) {
         console.error(error);
     }
@@ -192,7 +205,6 @@ async function pushToken(token) {
 async function getToken() {
     try {
         let token = await R.findOne("token");
-        console.log("DE TOKEN VAN GET TOKEN", token._token);
         return decryptToken(token._token, process.env.ENCRYPTIONKEY);
     } catch (error) {
         console.error(error);
@@ -239,4 +251,6 @@ module.exports = {
     createAddOnHeartbeat,
     pushToken,
     getToken,
+    checkUpdateCore,
+    updateCore
 };

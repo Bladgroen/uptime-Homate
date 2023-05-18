@@ -6,11 +6,12 @@
             <p>{{ name }}</p>
         </div>
         <div class="addon__status"></div>
-        <div v-if="updateAvailable === 1" class="addon__update">
+        <div v-if="update === 1" class="addon__update">
             <AddonUpdateButton
                 :id="id"
                 :slug="slug"
                 :name="name"
+                @update-parent="updateParentState"
             ></AddonUpdateButton>
         </div>
     </div>
@@ -42,6 +43,16 @@ export default {
         id: {
             type: Number,
             required: true,
+        },
+    },
+    data() {
+        return {
+            update: this.updateAvailable,
+        };
+    },
+    methods: {
+        updateParentState(newValue) {
+            this.update = newValue;
         },
     },
 };

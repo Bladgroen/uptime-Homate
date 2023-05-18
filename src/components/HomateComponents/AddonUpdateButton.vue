@@ -44,22 +44,29 @@ export default {
             this.isModalOpen = true;
             document.addEventListener("mousedown", this.handleClickOutside);
         },
+        updateParent() {
+            this.$emit("update-parent", 0);
+        },
         async next() {
             this.isModalOpen = false;
             document.removeEventListener("mousedown", this.handleClickOutside);
-            console.log("next ingedrukt");
-            this.$root
-                .getSocket()
-                .emit(
-                    "updateAddon",
-                    this.addonSlug,
-                    this.monitorURL,
-                    this.addonID,
-                    (res) => {
-                        console.log(res);
-                        this.$root.toastRes(res);
-                    }
-                );
+            try {
+                this.$root
+                    .getSocket()
+                    .emit(
+                        "updateAddon",
+                        this.addonSlug,
+                        this.monitorURL,
+                        this.addonID,
+                        (res) => {
+                            console.log(res);
+                            this.$root.toastRes(res);
+                        }
+                    );
+                this.updateParent();
+            } catch (error) {
+                console.log(error);
+            }
         },
         cancel() {
             this.isModalOpen = false;

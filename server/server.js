@@ -22,6 +22,8 @@ const {
     getUsage,
     createAddOnHeartbeat,
     pushToken,
+    checkUpdateCore,
+    updateCore
 } = require("./HomateLogic/HomateServerIntegration.ts");
 
 // Check Node.js Version
@@ -767,6 +769,7 @@ let needSetup = false;
                 delete monitor.accepted_statuscodes;
 
                 bean.import(monitor);
+                bean.update_available = await checkUpdateCore(monitor.url);
                 bean.user_id = socket.userID;
 
                 bean.validate();
@@ -843,6 +846,26 @@ let needSetup = false;
             }
         );
 
+        socket.on("updateCore", async(monitorURL, monitorID, callback) => {
+            try {
+                checkLogin(socket);
+                await updateCore(monitorURL, monitorID);
+
+                log.info("Core", `Updated core: ${monitorURL}`);
+
+                callback({
+                    ok: true,
+                    msg: "Core geupdate.",
+                })
+            } catch(error) {
+                log.error("Core", `Error updating core: ${monitorURL}`);
+                callback({
+                    ok: false,
+                    msg: error.message,
+                })
+            }
+        }))
+
         // Edit monitor
         socket.on("editMonitor", async (monitor, callback) => {
             try {
@@ -913,6 +936,7 @@ let needSetup = false;
                 bean.radiusCallingStationId = monitor.radiusCallingStationId;
                 bean.radiusSecret = monitor.radiusSecret;
                 bean.httpBodyEncoding = monitor.httpBodyEncoding;
+                bean.update_available = await checkUpdateCore(monitor.url);
 
                 bean.validate();
 
