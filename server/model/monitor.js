@@ -137,6 +137,7 @@ class Monitor extends BeanModel {
             radiusCallingStationId: this.radiusCallingStationId,
             game: this.game,
             httpBodyEncoding: this.httpBodyEncoding,
+            update_available: 0,
         };
 
         if (includeSensitiveData) {
@@ -176,6 +177,11 @@ class Monitor extends BeanModel {
             "SELECT mt.*, tag.name, tag.color FROM monitor_tag mt JOIN tag ON mt.tag_id = tag.id WHERE mt.monitor_id = ? ORDER BY tag.name",
             [this.id]
         );
+    }
+
+    /** Check if monitor can be updated */
+    async checkUpdateAvailable() {
+        //const response = await axios.get()
     }
 
     /**

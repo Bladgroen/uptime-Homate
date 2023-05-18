@@ -6,7 +6,11 @@
                 <label for="timezone" class="form-label">
                     {{ $t("Display Timezone") }}
                 </label>
-                <select id="timezone" v-model="$root.userTimezone" class="form-select">
+                <select
+                    id="timezone"
+                    v-model="$root.userTimezone"
+                    class="form-select"
+                >
                     <option value="auto">
                         {{ $t("Auto") }}: {{ guessTimezone }}
                     </option>
@@ -25,7 +29,11 @@
                 <label for="timezone" class="form-label">
                     {{ $t("Server Timezone") }}
                 </label>
-                <select id="timezone" v-model="settings.serverTimezone" class="form-select">
+                <select
+                    id="timezone"
+                    v-model="settings.serverTimezone"
+                    class="form-select"
+                >
                     <option value="UTC">UTC</option>
                     <option
                         v-for="(timezone, index) in timezoneList"
@@ -92,7 +100,11 @@
                     </label>
                 </div>
 
-                <div v-for="statusPage in $root.statusPageList" :key="statusPage.id" class="form-check">
+                <div
+                    v-for="statusPage in $root.statusPageList"
+                    :key="statusPage.id"
+                    class="form-check"
+                >
                     <input
                         :id="'status-page-' + statusPage.id"
                         v-model="settings.entryPage"
@@ -102,7 +114,10 @@
                         :value="'statusPage-' + statusPage.slug"
                         required
                     />
-                    <label class="form-check-label" :for="'status-page-' + statusPage.id">
+                    <label
+                        class="form-check-label"
+                        :for="'status-page-' + statusPage.id"
+                    >
                         {{ $t("Status Page") }} - {{ statusPage.title }}
                     </label>
                 </div>
@@ -124,8 +139,37 @@
                         pattern="https?://.+"
                         autocomplete="new-password"
                     />
-                    <button class="btn btn-outline-primary" type="button" @click="autoGetPrimaryBaseURL">
+                    <button
+                        class="btn btn-outline-primary"
+                        type="button"
+                        @click="autoGetPrimaryBaseURL"
+                    >
                         {{ $t("Auto Get") }}
+                    </button>
+                </div>
+
+                <div class="form-text"></div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label" for="BearerToken">
+                    {{ $t("Home Assistant Bearer token") }}
+                </label>
+
+                <div class="input-group mb-3">
+                    <input
+                        id="primaryBaseURL"
+                        v-model="token"
+                        class="form-control"
+                        name="Token"
+                        placeholder="Token"
+                    />
+                    <button
+                        class="btn btn-outline-primary"
+                        type="button"
+                        @click="pushToken"
+                    >
+                        {{ $t("Confirm") }}
                     </button>
                 </div>
 
@@ -213,6 +257,7 @@ export default {
     data() {
         return {
             timezoneList: timezoneList(),
+            token: "",
         };
     },
 
@@ -228,7 +273,7 @@ export default {
         },
         guessTimezone() {
             return dayjs.tz.guess();
-        }
+        },
     },
 
     methods: {
@@ -239,9 +284,16 @@ export default {
         },
         /** Get the base URL of the application */
         autoGetPrimaryBaseURL() {
-            this.settings.primaryBaseURL = location.protocol + "//" + location.host;
+            this.settings.primaryBaseURL =
+                location.protocol + "//" + location.host;
+        },
+        pushToken() {
+            this.$root.getSocket().emit("pushToken", this.token, (res) => {
+                console.log(res);
+                this.$root.toastRes(res);
+            });
+            this.token = "";
         },
     },
 };
 </script>
-

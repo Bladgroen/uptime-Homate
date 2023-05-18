@@ -147,34 +147,42 @@ async function createAddOnHeartbeat() {
     } catch (error) {
         console.error(error);
     }
-
-    async function getAddOnHeartbeat() {
-        try {
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    async function updateCore(monitorURL) {
-        const options = {
-            methods: "POST",
-            url: monitorURL.url + "/api/hassio/core/update",
-            headers: {
-                Authorization: "Bearer " + bearer,
-                "Content-Type": "application/json",
-            },
-        };
-        try {
-            //const checkUpdate = await axios.get(monitorURL.url + "/api/hassio/core/info");
-
-            await axios.request(options);
-            
-        } catch (error) {
-            console.error(error);
-        }
+}
+async function getAddOnHeartbeat() {
+    try {
+    } catch (error) {
+        console.error(error);
     }
 }
 
+async function updateCore(monitorURL) {
+    const options = {
+        methods: "POST",
+        url: monitorURL.url + "/api/hassio/core/update",
+        headers: {
+            Authorization: "Bearer " + bearer,
+            "Content-Type": "application/json",
+        },
+    };
+    try {
+        //const checkUpdate = await axios.get(monitorURL.url + "/api/hassio/core/info");
+
+        await axios.request(options);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function pushToken(token) {
+    try {
+        await R.exec("DELETE FROM token");
+        let tokenDB = R.dispense("token");
+        tokenDB.token = token;
+        await R.store(tokenDB);
+    } catch (error) {
+        console.error(error);
+    }
+}
 module.exports = {
     getAddOns,
     deleteAddOns,
@@ -182,4 +190,5 @@ module.exports = {
     updateAddOns,
     getUsage,
     createAddOnHeartbeat,
+    pushToken,
 };

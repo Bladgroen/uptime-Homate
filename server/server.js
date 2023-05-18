@@ -21,6 +21,7 @@ const {
     createAddons,
     getUsage,
     createAddOnHeartbeat,
+    pushToken,
 } = require("./HomateLogic/HomateServerIntegration.ts");
 
 // Check Node.js Version
@@ -798,6 +799,23 @@ let needSetup = false;
                 callback({
                     ok: false,
                     msg: e.message,
+                });
+            }
+        });
+
+        socket.on("pushToken", async (token, callback) => {
+            try {
+                checkLogin(socket);
+                await pushToken(token);
+                callback({
+                    ok: true,
+                    msg: "Token added.",
+                });
+            } catch (error) {
+                console.error(error);
+                callback({
+                    ok: false,
+                    msg: error.message,
                 });
             }
         });

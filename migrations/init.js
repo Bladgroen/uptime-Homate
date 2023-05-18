@@ -134,6 +134,7 @@ exports.up = function (knex) {
                 table.text("tls_ca").nullable();
                 table.text("tls_cert").nullable();
                 table.text("tls_key").nullable();
+                table.boolean("update_available").notNullable().defaultTo(0);
 
                 table
                     .foreign("user_id")
@@ -432,6 +433,11 @@ exports.up = function (knex) {
                 table.index(["add_on_id", "time"], "add_on_time_index");
                 table.index(["monitor_id"]);
                 table.index(["add_on_id"]);
+            })
+        )
+        .then(() =>
+            knex.schema.createTable("token", function (table) {
+                table.string("token", 200).primary();
             })
         );
 };
