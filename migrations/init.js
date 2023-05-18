@@ -437,7 +437,8 @@ exports.up = function (knex) {
         )
         .then(() =>
             knex.schema.createTable("token", function (table) {
-                table.string("token", 200).primary();
+                table.string("token", 500).primary();
+                table.datetime("time").notNullable();
             })
         );
 };
@@ -464,5 +465,6 @@ exports.down = function (knex) {
         .then(() => knex.schema.dropTable("sqlite_sequence"))
         .then(() => knex.schema.dropTable("status_page"))
         .then(() => knex.schema.dropTable("status_page_cname"))
-        .then(() => knex.schema.dropTable("add_on_heartbeat"));
+        .then(() => knex.schema.dropTable("add_on_heartbeat"))
+        .then(() => knex.schema.dropTable("token"));
 };

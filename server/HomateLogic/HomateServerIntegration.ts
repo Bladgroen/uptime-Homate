@@ -3,20 +3,21 @@ const cryptoModule = require("crypto");
 const { R } = require("redbean-node");
 require("dotenv").config({ path: "./secret.env" });
 
-const config = {
-    headers: {
-        //TODO bearer token is exposed
-        Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzYWE4YTAwMzQwOWM0YzM5YTAzYjJlZDE0OTJiZTJlNCIsImlhdCI6MTY4MzAzMzQ0NiwiZXhwIjoxOTk4MzkzNDQ2fQ._WqcQa21z3osFhZBYSveaPXiuLFGb6E-4FQFlpp71eM",
-        "Content-Type": "application/json",
-    },
-};
+async function createConfig() {
+    const config = {
+        headers: {
+            Authorization: "Bearer " + (await getToken()),
+            "Content-Type": "application/json",
+        },
+    };
+    return config;
+}
 
 async function getAddOns(monitorURL) {
     try {
         const apiURL = monitorURL + "/api/hassio/addons";
 
-        const response = await axios.get(apiURL, config);
+        const response = await axios.get(apiURL, await createConfig());
 
         const filteredAddons = response.data.data.addons.map((addon) => {
             return {
@@ -72,7 +73,7 @@ async function updateAddOns(slug, monitorURL, addonID) {
         method: "POST",
         url: monitorURL.url + "/api/hassio/store/addons/" + slug + "/update",
         headers: {
-            Authorization: "Bearer " + bearer,
+            Authorization: "Bearer " + await getToken(),
             "Content-Type": "application/json",
         },
     };
@@ -95,7 +96,7 @@ async function getUsage(monitorID) {
 
         let response = await axios.get(
             bean._url + "/api/hassio/core/stats",
-            config
+            await createConfig()
         );
 
         let usage = {
@@ -114,7 +115,7 @@ async function createAddOnHeartbeat() {
         bean.forEach(async (monitor) => {
             let response = await axios.get(
                 monitor._url + "/api/hassio/addons",
-                config
+                await createConfig()
             );
             let addons = response.data.data.addons;
             addons.forEach(async (addon) => {
@@ -128,9 +129,6 @@ async function createAddOnHeartbeat() {
                     addonDB.active = addon.state === "started";
 
                     addonDB.update_available = addon.update_available;
-                    console.log(
-                        "🚀 ~ file: HomateServerIntegration.ts:127 ~ addons.forEach ~ addon.state: ER IS EEN ADDONDB "
-                    );
                     //await R.store(addonDB);
                     const status = {
                         monitor_id: monitor._id,
@@ -179,8 +177,23 @@ async function pushToken(token) {
         await R.exec("DELETE FROM token");
         const encryptedToken = encryptToken(token, process.env.ENCRYPTIONKEY);
         let tokenDB = R.dispense("token");
-        tokenDB.token = encryptedToken;
+        const bearerToken = {
+            token: encryptedToken,
+            time: new Date(),
+        };
+        tokenDB.import(bearerToken);
         await R.store(tokenDB);
+        console.log(await getToken());
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function getToken() {
+    try {
+        let token = await R.findOne("token");
+        console.log("DE TOKEN VAN GET TOKEN", token._token);
+        return decryptToken(token._token, process.env.ENCRYPTIONKEY);
     } catch (error) {
         console.error(error);
     }
@@ -225,4 +238,5 @@ module.exports = {
     getUsage,
     createAddOnHeartbeat,
     pushToken,
+    getToken,
 };
