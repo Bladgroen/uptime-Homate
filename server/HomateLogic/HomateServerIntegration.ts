@@ -1,6 +1,7 @@
 const axios = require("axios");
-
+const cryptoModule = require("crypto");
 const { R } = require("redbean-node");
+require("dotenv").config({ path: "./secret.env" });
 
 const config = {
     headers: {
@@ -176,13 +177,46 @@ async function updateCore(monitorURL) {
 async function pushToken(token) {
     try {
         await R.exec("DELETE FROM token");
+        const encryptedToken = encryptToken(token, process.env.ENCRYPTIONKEY);
         let tokenDB = R.dispense("token");
-        tokenDB.token = token;
+        tokenDB.token = encryptedToken;
         await R.store(tokenDB);
     } catch (error) {
         console.error(error);
     }
 }
+
+function encryptToken(token, encryptionKey) {
+    const iv = cryptoModule.randomBytes(16);
+
+    const keyBuffer = Buffer.from(encryptionKey, "hex");
+
+    const cipher = cryptoModule.createCipheriv("aes-256-cbc", keyBuffer, iv);
+
+    let encrypted = cipher.update(token, "utf8", "hex");
+    encrypted += cipher.final("hex");
+
+    return iv.toString("hex") + encrypted;
+}
+
+function decryptToken(encryptedToken, encryptionKey) {
+    const iv = Buffer.from(encryptedToken.substr(0, 32), "hex");
+
+    const encrypted = encryptedToken.substr(32);
+
+    const keyBuffer = Buffer.from(encryptionKey, "hex");
+
+    const decipher = cryptoModule.createDecipheriv(
+        "aes-256-cbc",
+        keyBuffer,
+        iv
+    );
+
+    let decrypted = decipher.update(encrypted, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+    return decrypted;
+}
+
 module.exports = {
     getAddOns,
     deleteAddOns,
