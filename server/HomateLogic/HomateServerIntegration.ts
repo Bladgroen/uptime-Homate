@@ -126,7 +126,7 @@ async function createAddOnHeartbeat() {
                     addonDB.active = addon.state === "started";
 
                     addonDB.update_available = addon.update_available;
-                    //await R.store(addonDB);
+                    await R.store(addonDB);
                     const status = {
                         monitor_id: monitor._id,
                         add_on_id: addonDB.id,

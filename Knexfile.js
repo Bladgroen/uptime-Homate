@@ -22,7 +22,7 @@ switch (dbType) {
             useNullAsDefault: true,
             pool: {
                 min: 1,
-                max: 1,
+                max: 10,
                 idleTimeoutMillis: 120 * 1000,
                 propagateCreateError: false,
                 acquireTimeoutMillis: 120 * 1000,

@@ -6,6 +6,7 @@
             <p>{{ name }}</p>
         </div>
         <div class="addon__status"></div>
+        <p>{{ test }}</p>
         <div v-if="update === 1" class="addon__update">
             <AddonUpdateButton
                 :id="id"
@@ -44,23 +45,53 @@ export default {
             type: Number,
             required: true,
         },
-        heartbeatList: {
-            type: Object,
-            required: true,
-        },
     },
     data() {
         return {
             update: this.updateAvailable,
-            heartbeat: this.heartbeatList,
+            heartbeat: {},
+            test: null,
+            filteredList: {},
         };
     },
-    mounted() {
-        // console.log(this.heartbeatList);
+    created() {
+        //this.getAddOnHeartbeat();
+        //this.test = this.getFilteredHeartbeatList(67);
+        console.log(this.test);
     },
     methods: {
         updateParentState(newValue) {
             this.update = newValue;
+        },
+        getAddOnHeartbeat() {
+            this.$root.getSocket().emit("getAddonHeartbeat");
+
+            this.$root.getSocket().on("addonHeartbeat", (data) => {
+                console.log("test");
+                this.heartbeat = data;
+                //this.filteredList = this.getFilteredHeartbeatList();
+            });
+        },
+        getFilteredHeartbeatList(addonID) {
+            let selectedEntry = null;
+            let latestTime = 0;
+
+            const monitorID = this.$route.params.id;
+            for (const key in this.heartbeat) {
+                const heartbeat = this.heartbeatList[key];
+                console.log("🚀 ~ heartbeat:", heartbeat);
+
+                if (
+                    heartbeat._addOnId === addonID &&
+                    heartbeat._monitorID === monitorID &&
+                    heartbeat._time > latestTime
+                ) {
+                    console.log(heartbeat.addon_id);
+                    selectedEntry = heartbeat;
+                    latestTime = heartbeat._time;
+                }
+            }
+            return selectedEntry;
         },
     },
 };

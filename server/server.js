@@ -341,6 +341,7 @@ let needSetup = false;
         let intervalId = null;
 
         socket.on("getUsage", async (monitorID) => {
+            await checkLogin(socket);
             //clear previous interval
             if (intervalId) {
                 clearInterval(intervalId);
@@ -370,6 +371,7 @@ let needSetup = false;
         let intervalAddon = null;
 
         socket.on("getAddonHeartbeat", async () => {
+            await checkLogin(socket);
             if (intervalAddon) {
                 clearInterval(intervalAddon);
                 intervalAddon = null;
@@ -383,7 +385,7 @@ let needSetup = false;
                 let list = await getAddOnHeartbeat();
 
                 socket.emit("addonHeartbeat", list);
-            }, 2000);
+            }, 60000);
             socket.on("disconnect", () => {
                 clearInterval(intervalAddon);
             });
@@ -1929,8 +1931,8 @@ async function checkOwner(userID, monitorID) {
  * @returns {Promise<void>}
  */
 async function afterLogin(socket, user) {
-    socket.userID = user.id;
-    socket.join(user.id);
+    socket.userID = user.role_id;
+    socket.join(user.role_id);
 
     let monitorList = await server.sendMonitorList(socket);
     server.sendMaintenanceList(socket);
@@ -1952,7 +1954,7 @@ async function afterLogin(socket, user) {
     }
 
     for (let monitorID in monitorList) {
-        await Monitor.sendStats(io, monitorID, user.id);
+        await Monitor.sendStats(io, monitorID, user.role_id);
     }
 
     // Set server timezone from client browser if not set

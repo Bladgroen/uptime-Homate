@@ -16,6 +16,7 @@ exports.up = function (knex) {
                 table.string("twofa_secret", 64);
                 table.boolean("twofa_status").notNullable().defaultTo(false);
                 table.string("twofa_last_token", 6);
+                table.integer("role_id").notNullable().defaultTo(1);
             })
         )
         .then(() =>
