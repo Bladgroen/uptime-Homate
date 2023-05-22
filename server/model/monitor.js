@@ -920,7 +920,7 @@ class Monitor extends BeanModel {
                 apicache.clear();
 
                 UptimeKumaServer.getInstance().sendMaintenanceListByUserID(
-                    this.user_id
+                    this.user_organization
                 );
             } else {
                 bean.important = false;
@@ -968,8 +968,8 @@ class Monitor extends BeanModel {
 
             log.debug("monitor", `[${this.name}] Send to socket`);
             UptimeCacheList.clearCache(this.id);
-            io.to(this.user_id).emit("heartbeat", bean.toJSON());
-            Monitor.sendStats(io, this.id, this.user_id);
+            io.to(this.user_organization).emit("heartbeat", bean.toJSON());
+            Monitor.sendStats(io, this.id, this.user_organization);
 
             log.debug("monitor", `[${this.name}] Store`);
             await R.store(bean);

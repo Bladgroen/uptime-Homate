@@ -469,7 +469,7 @@ let needSetup = false;
             }
 
             let user = await login(data.username, data.password);
-
+            console.log("DIT IS DE USER", user);
             if (user) {
                 if (user.twofa_status === 0) {
                     afterLogin(socket, user);
@@ -750,15 +750,10 @@ let needSetup = false;
                     );
                 }
 
-                if ((await R.count("user")) !== 0) {
-                    throw new Error(
-                        "Uptime Kuma has been initialized. If you want to run setup again, please delete the database."
-                    );
-                }
-
                 let user = R.dispense("user");
                 user.username = username;
                 user.password = passwordHash.generate(password);
+                user.role = true;
                 await R.store(user);
 
                 needSetup = false;
@@ -795,15 +790,14 @@ let needSetup = false;
 
                 bean.import(monitor);
                 bean.update_available = await checkUpdateCore(monitor.url);
-                bean.user_id = socket.userID;
+                bean.user_organization = socket.user_organization;
 
-                bean.validate();
                 await R.store(bean);
 
                 await updateMonitorNotification(bean.id, notificationIDList);
 
                 await server.sendMonitorList(socket);
-                await startMonitor(socket.userID, bean.id);
+                await startMonitor(socket.user_organization, bean.id);
 
                 log.info(
                     "monitor",
@@ -897,7 +891,7 @@ let needSetup = false;
 
                 let bean = await R.findOne("monitor", " id = ? ", [monitor.id]);
 
-                if (bean.user_id !== socket.userID) {
+                if (bean.group !== socket.user_organization) {
                     throw new Error("Permission denied.");
                 }
 
@@ -961,6 +955,7 @@ let needSetup = false;
                 bean.radiusSecret = monitor.radiusSecret;
                 bean.httpBodyEncoding = monitor.httpBodyEncoding;
                 bean.update_available = await checkUpdateCore(monitor.url);
+                bean.user_organization = socket.user_organization;
 
                 bean.validate();
 
@@ -975,7 +970,7 @@ let needSetup = false;
                 );
 
                 if (bean.active) {
-                    await restartMonitor(socket.userID, bean.id);
+                    await restartMonitor(socket.user_organization, bean.id);
                 }
 
                 await server.sendMonitorList(socket);
@@ -1021,8 +1016,8 @@ let needSetup = false;
 
                 let bean = await R.findOne(
                     "monitor",
-                    " id = ? AND user_id = ? ",
-                    [monitorID, socket.userID]
+                    " id = ? AND user_organization = ? ",
+                    [monitorID, socket.user_organization]
                 );
 
                 callback({
@@ -1076,7 +1071,7 @@ let needSetup = false;
         socket.on("resumeMonitor", async (monitorID, callback) => {
             try {
                 checkLogin(socket);
-                await startMonitor(socket.userID, monitorID);
+                await startMonitor(socket.user_organization, monitorID);
                 await server.sendMonitorList(socket);
 
                 callback({
@@ -1094,7 +1089,7 @@ let needSetup = false;
         socket.on("pauseMonitor", async (monitorID, callback) => {
             try {
                 checkLogin(socket);
-                await pauseMonitor(socket.userID, monitorID);
+                await pauseMonitor(socket.user_organization, monitorID);
                 await server.sendMonitorList(socket);
 
                 callback({
@@ -1124,8 +1119,8 @@ let needSetup = false;
                 }
 
                 await R.exec(
-                    "DELETE FROM monitor WHERE id = ? AND user_id = ? ",
-                    [monitorID, socket.userID]
+                    "DELETE FROM monitor WHERE id = ? AND user_organization = ? ",
+                    [monitorID, socket.user_organization]
                 );
 
                 await deleteAddOns(monitorID);
@@ -1677,7 +1672,8 @@ let needSetup = false;
                                 delete monitor.accepted_statuscodes;
 
                                 bean.import(monitor);
-                                bean.user_id = socket.userID;
+                                bean.user_organization =
+                                    socket.user_organization;
                                 await R.store(bean);
 
                                 // Only for backup files with the version 1.7.0 or higher, since there was the tag feature implemented
@@ -1721,9 +1717,15 @@ let needSetup = false;
 
                                 // If monitor was active start it immediately, otherwise pause it
                                 if (monitorListData[i].active === 1) {
-                                    await startMonitor(socket.userID, bean.id);
+                                    await startMonitor(
+                                        socket.user_organization,
+                                        bean.id
+                                    );
                                 } else {
-                                    await pauseMonitor(socket.userID, bean.id);
+                                    await pauseMonitor(
+                                        socket.user_organization,
+                                        bean.id
+                                    );
                                 }
                             }
                         }
@@ -1914,7 +1916,7 @@ async function updateMonitorNotification(monitorID, notificationIDList) {
  */
 async function checkOwner(userID, monitorID) {
     let row = await R.getRow(
-        "SELECT id FROM monitor WHERE id = ? AND user_id = ? ",
+        "SELECT id FROM monitor WHERE id = ? AND user_organization = ? ",
         [monitorID, userID]
     );
 
@@ -1931,8 +1933,10 @@ async function checkOwner(userID, monitorID) {
  * @returns {Promise<void>}
  */
 async function afterLogin(socket, user) {
-    socket.userID = user.role_id;
-    socket.join(user.role_id);
+    socket.userID = user.id;
+    socket.user_organization = user.user_organization;
+    socket.join(user.id);
+    socket.join(user.user_organization);
 
     let monitorList = await server.sendMonitorList(socket);
     server.sendMaintenanceList(socket);
@@ -1940,7 +1944,6 @@ async function afterLogin(socket, user) {
     sendProxyList(socket);
     sendDockerHostList(socket);
     sendAPIKeyList(socket);
-
     await sleep(500);
 
     await StatusPage.sendStatusPageList(io, socket);
@@ -2012,12 +2015,13 @@ async function initDatabase(testMode = false) {
  * @returns {Promise<void>}
  */
 async function startMonitor(userID, monitorID) {
+    console.log(userID);
     await checkOwner(userID, monitorID);
 
     log.info("manage", `Resume Monitor: ${monitorID} User ID: ${userID}`);
 
     await R.exec(
-        "UPDATE monitor SET active = 1 WHERE id = ? AND user_id = ? ",
+        "UPDATE monitor SET active = 1 WHERE id = ? AND user_organization = ? ",
         [monitorID, userID]
     );
 
@@ -2053,7 +2057,7 @@ async function pauseMonitor(userID, monitorID) {
     log.info("manage", `Pause Monitor: ${monitorID} User ID: ${userID}`);
 
     await R.exec(
-        "UPDATE monitor SET active = 0 WHERE id = ? AND user_id = ? ",
+        "UPDATE monitor SET active = 0 WHERE id = ? AND user_organization = ? ",
         [monitorID, userID]
     );
 

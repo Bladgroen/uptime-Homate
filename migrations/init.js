@@ -16,7 +16,14 @@ exports.up = function (knex) {
                 table.string("twofa_secret", 64);
                 table.boolean("twofa_status").notNullable().defaultTo(false);
                 table.string("twofa_last_token", 6);
-                table.integer("role_id").notNullable().defaultTo(1);
+                table
+                    .integer("user_organization")
+                    .unsigned()
+                    .notNullable()
+                    .defaultTo(1);
+                table.boolean("role").notNullable();
+
+                table.index(["user_organization"]);
             })
         )
         .then(() =>
@@ -72,7 +79,6 @@ exports.up = function (knex) {
                 table.increments("id").primary().unsigned();
                 table.string("name", 150);
                 table.boolean("active").notNullable().defaultTo(1);
-                table.integer("user_id").unsigned();
                 table.integer("interval").notNullable().defaultTo(20);
                 table.text("url");
                 table.string("type", 20);
@@ -135,17 +141,20 @@ exports.up = function (knex) {
                 table.text("tls_ca").nullable();
                 table.text("tls_cert").nullable();
                 table.text("tls_key").nullable();
+                table.integer("user_organization").unsigned();
                 table
                     .boolean("update_available")
                     .notNullable()
                     .defaultTo(false);
 
                 table
-                    .foreign("user_id")
-                    .references("user.id")
+                    .foreign("user_organization")
+                    .references("user.user_organization")
                     .onDelete("SET NULL")
                     .onUpdate("CASCADE");
+
                 table.index(["id"]);
+                table.index(["user_organization"]);
             })
         )
         .then(() =>

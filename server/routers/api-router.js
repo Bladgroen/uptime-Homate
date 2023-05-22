@@ -113,9 +113,9 @@ router.get("/api/push/:pushToken", async (request, response) => {
 
         await R.store(bean);
 
-        io.to(monitor.user_id).emit("heartbeat", bean.toJSON());
+        io.to(monitor.user_organization).emit("heartbeat", bean.toJSON());
         UptimeCacheList.clearCache(monitor.id);
-        Monitor.sendStats(io, monitor.id, monitor.user_id);
+        Monitor.sendStats(io, monitor.id, monitor.user_organization);
         new Prometheus(monitor).update(bean, undefined);
 
         response.json({
