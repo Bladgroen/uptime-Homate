@@ -1,7 +1,7 @@
 import legacy from "@vitejs/plugin-legacy";
 import vue from "@vitejs/plugin-vue";
-import { defineConfig } from "vite";
 import visualizer from "rollup-plugin-visualizer";
+import { defineConfig } from "vite";
 import viteCompression from "vite-plugin-compression";
 
 const postCssScss = require("postcss-scss");
@@ -15,15 +15,15 @@ export default defineConfig({
         port: 3000,
     },
     define: {
-        "FRONTEND_VERSION": JSON.stringify(process.env.npm_package_version),
+        FRONTEND_VERSION: JSON.stringify(process.env.npm_package_version),
     },
     plugins: [
         vue(),
         legacy({
-            targets: [ "since 2015" ],
+            targets: ["since 2015"],
         }),
         visualizer({
-            filename: "tmp/dist-stats.html"
+            filename: "tmp/dist-stats.html",
         }),
         viteCompression({
             algorithm: "gzip",
@@ -36,18 +36,17 @@ export default defineConfig({
     ],
     css: {
         postcss: {
-            "parser": postCssScss,
-            "map": false,
-            "plugins": [ postcssRTLCSS ]
-        }
+            parser: postCssScss,
+            map: false,
+            plugins: [postcssRTLCSS],
+        },
     },
     build: {
         rollupOptions: {
+            treeshake: true,
             output: {
-                manualChunks(id, { getModuleInfo, getModuleIds }) {
-
-                }
-            }
+                manualChunks(id, { getModuleInfo, getModuleIds }) {},
+            },
         },
-    }
+    },
 });

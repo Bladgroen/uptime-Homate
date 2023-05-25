@@ -25,11 +25,10 @@ async function getAddOns(monitorURL) {
                 slug: addon.slug,
                 update_available: addon.update_available,
                 state: addon.state,
-                url: apiURL + "/" + addon.slug + "/stats",
+                url: apiURL + "/" + addon.slug,
                 icon: apiURL + "/" + addon.slug + "/icon",
             };
         });
-
         return filteredAddons;
     } catch (error) {
         console.error(error);
@@ -252,6 +251,7 @@ function encryptToken(token, encryptionKey) {
     return iv.toString("hex") + encrypted;
 }
 
+
 function decryptToken(encryptedToken, encryptionKey) {
     const iv = Buffer.from(encryptedToken.substr(0, 32), "hex");
 
@@ -270,6 +270,15 @@ function decryptToken(encryptedToken, encryptionKey) {
     return decrypted;
 }
 
+function getAllUsers() {
+    try {
+        let users = R.findAll("user");
+        return users;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 module.exports = {
     getAddOns,
     deleteAddOns,
@@ -282,4 +291,5 @@ module.exports = {
     checkUpdateCore,
     updateCore,
     getAddOnHeartbeat,
+    getAllUsers,
 };

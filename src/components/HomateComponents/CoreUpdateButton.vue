@@ -105,6 +105,7 @@ export default {
 .modal {
     display: flex;
     flex-direction: column;
+    border: black 1px solid;
     position: fixed;
     top: 50%;
     left: 50%;

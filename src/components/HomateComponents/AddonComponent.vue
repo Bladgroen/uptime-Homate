@@ -5,8 +5,7 @@
 
             <p>{{ name }}</p>
         </div>
-        <div class="addon__status"></div>
-        <p>{{ test }}</p>
+        <div class="addon__status"><div></div></div>
         <div v-if="update === 1" class="addon__update">
             <AddonUpdateButton
                 :id="id"
@@ -101,21 +100,38 @@ export default {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
 
     &__name {
         display: flex;
         flex-direction: row;
-
+        max-width: 25rem;
+        min-width: 25rem;
+        margin-left: 2rem;
         p {
             align-self: center;
             margin: 0;
+            margin-left: 0.5rem;
         }
 
         img {
             width: 4.375rem;
             height: 4.375rem;
         }
+    }
+
+    &__status {
+        max-width: 20rem;
+        min-width: 20rem;
+
+        div {
+            border-radius: 50px;
+            width: 3.125rem;
+            height: 3.125rem;
+            background-color: #5cdd8b;
+        }
+    }
+
+    &__update {
     }
 }
 </style>

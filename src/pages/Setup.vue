@@ -11,7 +11,7 @@
                             margin-top: 5px;
                         "
                     >
-                        Uptime Kuma
+                        Homate
                     </div>
                 </div>
 
@@ -105,11 +105,11 @@ export default {
     },
     watch: {},
     mounted() {
-        // this.$root.getSocket().emit("needSetup", (needSetup) => {
-        //     if (! needSetup) {
-        //         this.$router.push("/");
-        //     }
-        // });
+        this.$root.getSocket().emit("needSetup", (needSetup) => {
+            if (! needSetup) {
+                this.$router.push("/");
+            }
+        });
     },
     methods: {
         /**

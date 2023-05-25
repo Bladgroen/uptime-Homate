@@ -5,6 +5,7 @@
             <h5 class="my-4 settings-subheading">
                 {{ $t("Users") }}
             </h5>
+            <UserComponent></UserComponent>
             <AddUser></AddUser>
             <template v-if="!settings.disableAuth">
                 <h5 class="my-4 settings-subheading">
@@ -137,12 +138,14 @@
 import Confirm from "../../components/Confirm.vue";
 import TwoFADialog from "../../components/TwoFADialog.vue";
 import AddUser from "../HomateComponents/AddUser.vue";
+import UserComponent from "../HomateComponents/UserComponent.vue";
 
 export default {
     components: {
         Confirm,
         TwoFADialog,
         AddUser,
+        UserComponent,
     },
 
     data() {
@@ -153,6 +156,7 @@ export default {
                 newPassword: "",
                 repeatNewPassword: "",
             },
+            Users: null,
         };
     },
 
@@ -167,11 +171,15 @@ export default {
             return this.$parent.$parent.$parent.settingsLoaded;
         },
     },
-
     watch: {
         "password.repeatNewPassword"() {
             this.invalidPassword = false;
         },
+    },
+    mounted() {
+        this.$root.getSocket().emit("getUsers", (res) => {
+            console.log(res);
+        });
     },
 
     methods: {

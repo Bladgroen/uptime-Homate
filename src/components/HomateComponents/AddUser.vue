@@ -8,7 +8,6 @@
         ref="modal"
         :class="{ show: isModalOpen }"
         class="modal"
-        @click="cancel"
     >
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -20,18 +19,77 @@
             />
         </svg>
         <h2>Add User</h2>
-        <input />
-        <input />
-        <button @click="next">Add</button>
-        <button @click="cancel">Cancel</button>
+        <label for="username" class="form-label">
+            {{ $t("Username") }}
+        </label>
+        <input id="username" v-model="username" class="form-control" required />
+        <label for="firstPassword" class="form-label">
+            {{ $t("Password") }}
+        </label>
+        <input
+            id="firstPassword"
+            v-model="firstPassword"
+            class="form-control"
+            type="password"
+            required
+        />
+        <label for="secondPassword" class="form-label">
+            {{ $t("Repeat password") }}
+        </label>
+        <input
+            id="secondPassword"
+            v-model="secondPassword"
+            class="form-control"
+            type="password"
+            required
+        />
+        <div class="roleRadio">
+            <label class="form-check-label">
+                <input
+                    v-model="selectedRole"
+                    class="form-check-input"
+                    type="radio"
+                    value="admin"
+                />
+                Admin
+            </label>
+            <label class="form-check-label">
+                <input
+                    v-model="selectedRole"
+                    class="form-check-input"
+                    type="radio"
+                    value="user"
+                />
+                User
+            </label>
+        </div>
+        <div>
+            <button
+                class="addUserButton"
+                type="submit"
+                :disabled="processing"
+                data-cy="submit-setup-form"
+                @click="submit"
+            >
+                Add
+            </button>
+            <button class="addUserButton" @click="cancel">Cancel</button>
+        </div>
     </div>
 </template>
 
 <script>
+import { useToast } from "vue-toastification";
+const toast = useToast();
 export default {
     data() {
         return {
             isModalOpen: false,
+            userName: "",
+            firstPassword: "",
+            secondPassword: "",
+            selectedRole: "user",
+            processing: false,
         };
     },
     methods: {
@@ -47,6 +105,32 @@ export default {
             if (this.$refs.modal && !this.$refs.modal.contains(event.target)) {
                 this.cancel();
             }
+        },
+        submit() {
+            this.processing = true;
+
+            if (this.firstPassword !== this.secondPassword) {
+                toast.error(this.$t("passwords do not match"));
+                this.processing = false;
+                return;
+            }
+            const isAdmin = this.selectedRole === "admin";
+            this.$root
+                .getSocket()
+                .emit(
+                    "setup",
+                    this.username,
+                    this.firstPassword,
+                    isAdmin,
+                    (res) => {
+                        this.processing = false;
+                        this.$root.toastRes(res);
+                        if (res.ok) {
+                            this.processing = true;
+                            this.isModalOpen = false;
+                        }
+                    }
+                );
         },
     },
 };
@@ -74,6 +158,7 @@ export default {
 .modal {
     display: none;
     flex-direction: column;
+    border: black 1px solid;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -84,7 +169,7 @@ export default {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     width: 80%;
     max-width: 400px;
-    height: 40%;
+    height: 80%;
     background-color: #0d1117;
     align-items: center;
     justify-content: center;
@@ -106,5 +191,30 @@ export default {
 }
 .modal.show {
     display: flex;
+}
+
+.form-control {
+    margin-bottom: 1rem;
+}
+
+.roleRadio {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.addUserButton {
+    background-color: #5cdd8b;
+    margin: 1rem;
+    padding: 1rem;
+    color: black;
+    border: none;
+    border-radius: 50px;
+    width: 6.25rem;
+}
+
+.addUserButton:hover {
+    background-color: #7ce8a4;
 }
 </style>

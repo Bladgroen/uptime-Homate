@@ -25,6 +25,7 @@ const {
     checkUpdateCore,
     updateCore,
     getAddOnHeartbeat,
+    getAllUsers,
 } = require("./HomateLogic/HomateServerIntegration.ts");
 
 // Check Node.js Version
@@ -338,6 +339,14 @@ let needSetup = false;
             socket.emit("setup");
         }
 
+        socket.on("getUsers", async () => {
+            await checkLogin(socket);
+
+            let users = await getAllUsers();
+
+            return users;
+        });
+
         let intervalId = null;
 
         socket.on("getUsage", async (monitorID) => {
@@ -469,7 +478,6 @@ let needSetup = false;
             }
 
             let user = await login(data.username, data.password);
-            console.log("DIT IS DE USER", user);
             if (user) {
                 if (user.twofa_status === 0) {
                     afterLogin(socket, user);
@@ -742,33 +750,34 @@ let needSetup = false;
             callback(needSetup);
         });
 
-        socket.on("setup", async (username, password, callback) => {
-            try {
-                if (passwordStrength(password).value === "Too weak") {
-                    throw new Error(
-                        "Password is too weak. It should contain alphabetic and numeric characters. It must be at least 6 characters in length."
-                    );
+        socket.on(
+            "setup",
+            async (username, password, role = true, callback) => {
+                try {
+                    if (passwordStrength(password).value === "Too weak") {
+                        throw new Error(
+                            "Password is too weak. It should contain alphabetic and numeric characters. It must be at least 6 characters in length."
+                        );
+                    }
+
+                    let user = R.dispense("user");
+                    user.username = username;
+                    user.password = passwordHash.generate(password);
+                    user.role = role;
+                    await R.store(user);
+
+                    callback({
+                        ok: true,
+                        msg: "Added Successfully.",
+                    });
+                } catch (e) {
+                    callback({
+                        ok: false,
+                        msg: e.message,
+                    });
                 }
-
-                let user = R.dispense("user");
-                user.username = username;
-                user.password = passwordHash.generate(password);
-                user.role = true;
-                await R.store(user);
-
-                needSetup = false;
-
-                callback({
-                    ok: true,
-                    msg: "Added Successfully.",
-                });
-            } catch (e) {
-                callback({
-                    ok: false,
-                    msg: e.message,
-                });
             }
-        });
+        );
 
         // ***************************
         // Auth Only API
@@ -890,8 +899,12 @@ let needSetup = false;
                 checkLogin(socket);
 
                 let bean = await R.findOne("monitor", " id = ? ", [monitor.id]);
+                console.log(
+                    "🚀 ~ file: server.js:902 ~ socket.on ~ bean:",
+                    monitor.port
+                );
 
-                if (bean.group !== socket.user_organization) {
+                if (bean.user_organization !== socket.user_organization) {
                     throw new Error("Permission denied.");
                 }
 
@@ -913,7 +926,7 @@ let needSetup = false;
                 bean.hostname = monitor.hostname;
                 bean.game = monitor.game;
                 bean.maxretries = monitor.maxretries;
-                bean.port = parseInt(monitor.port);
+                bean.port = null;
                 bean.keyword = monitor.keyword;
                 bean.ignoreTls = monitor.ignoreTls;
                 bean.expiryNotification = monitor.expiryNotification;

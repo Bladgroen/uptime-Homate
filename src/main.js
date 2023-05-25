@@ -1,4 +1,5 @@
 import "bootstrap";
+import compression from "compression";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
@@ -20,6 +21,7 @@ import theme from "./mixins/theme";
 import timezone from "./modules/dayjs/plugin/timezone";
 import { router } from "./router";
 import { appName } from "./util.ts";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(relativeTime);

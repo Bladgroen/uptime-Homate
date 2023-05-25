@@ -114,6 +114,7 @@ export default {
     display: flex;
     flex-direction: column;
     position: fixed;
+    border: black 1px solid;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
