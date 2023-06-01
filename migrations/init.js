@@ -21,7 +21,7 @@ exports.up = function (knex) {
                     .unsigned()
                     .notNullable()
                     .defaultTo(1);
-                table.boolean("role").notNullable();
+                table.string("role", 255).notNullable();
 
                 table.index(["user_organization"]);
             })

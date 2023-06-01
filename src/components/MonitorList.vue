@@ -23,6 +23,7 @@
                 </form>
             </div>
         </div>
+
         <div class="monitor-list" :class="{ scrollbar: scrollbar }">
             <div
                 v-if="Object.keys($root.monitorList).length === 0"
@@ -31,52 +32,59 @@
                 {{ $t("No Monitors, please") }}
                 <router-link to="/add">{{ $t("add one") }}</router-link>
             </div>
-
-            <router-link
+            <div
                 v-for="(item, index) in sortedMonitorList"
                 :key="index"
-                :to="monitorURL(item.id)"
-                class="item"
-                :class="{ disabled: !item.active }"
-                :title="item.description"
+                class="checkboxWrapper"
             >
-                <div class="row">
-                    <div
-                        class="col-9 col-md-8 small-padding"
-                        :class="{
-                            'monitor-item':
-                                $root.userHeartbeatBar == 'bottom' ||
-                                $root.userHeartbeatBar == 'none',
-                        }"
-                    >
-                        <div class="info">
-                            <Uptime :monitor="item" type="24" :pill="true" />
-                            {{ item.name }}
+                <input
+                    v-model="item.checked"
+                    type="checkbox"
+                    @change="toggleCheckboxes"
+                />
+                <router-link
+                    :to="monitorURL(item.id)"
+                    class="item"
+                    :class="{ disabled: !item.active }"
+                    :title="item.description"
+                >
+                    <div class="row">
+                        <div
+                            class="col-9 col-md-8 small-padding"
+                            :class="{
+                                'monitor-item':
+                                    $root.userHeartbeatBar == 'bottom' ||
+                                    $root.userHeartbeatBar == 'none',
+                            }"
+                        >
+                            <div class="info">
+                                {{ item.name }}
+                            </div>
+                            <div class="tags">
+                                <Tag
+                                    v-for="tag in item.tags"
+                                    :key="tag"
+                                    :item="tag"
+                                    :size="'sm'"
+                                />
+                            </div>
                         </div>
-                        <div class="tags">
-                            <Tag
-                                v-for="tag in item.tags"
-                                :key="tag"
-                                :item="tag"
-                                :size="'sm'"
-                            />
+                        <div
+                            v-show="$root.userHeartbeatBar == 'normal'"
+                            :key="$root.userHeartbeatBar"
+                            class="col-3 col-md-4"
+                        >
+                            <HAStatus :monitor-id="item.id" size="small" />
                         </div>
                     </div>
-                    <div
-                        v-show="$root.userHeartbeatBar == 'normal'"
-                        :key="$root.userHeartbeatBar"
-                        class="col-3 col-md-4"
-                    >
-                        <HAStatus :monitor-id="item.id" size="small" />
-                    </div>
-                </div>
 
-                <div v-if="$root.userHeartbeatBar == 'bottom'" class="row">
-                    <div class="col-12 bottom-style">
-                        <HAStatus :monitor-id="item.id" size="small" />
+                    <div v-if="$root.userHeartbeatBar == 'bottom'" class="row">
+                        <div class="col-12 bottom-style">
+                            <HAStatus :monitor-id="item.id" size="small" />
+                        </div>
                     </div>
-                </div>
-            </router-link>
+                </router-link>
+            </div>
         </div>
     </div>
 </template>
@@ -87,11 +95,10 @@ import HAStatus from "../components/HomateComponents/HAStatus.vue";
 import Tag from "../components/Tag.vue";
 import Uptime from "../components/Uptime.vue";
 import { getMonitorRelativeURL } from "../util.ts";
+import { reactive } from "vue";
 
 export default {
     components: {
-        Uptime,
-        HeartbeatBar,
         Tag,
         HAStatus,
     },
@@ -127,6 +134,7 @@ export default {
 
         sortedMonitorList() {
             let result = Object.values(this.$root.monitorList);
+            console.log(result.toString());
 
             result.sort((m1, m2) => {
                 if (m1.active !== m2.active) {
@@ -173,8 +181,22 @@ export default {
                     );
                 });
             }
+            const reactiveResult = result.map((item) => {
+                return { ...item, checked: false };
+            });
 
-            return result;
+            return reactiveResult;
+        },
+
+        selectAll: {
+            get() {
+                return this.sortedMonitorList.every((item) => item.checked);
+            },
+            set(value) {
+                this.sortedMonitorList.forEach((item) => {
+                    item.checked = value;
+                });
+            },
         },
     },
     mounted() {
@@ -204,6 +226,12 @@ export default {
         clearSearchText() {
             this.searchText = "";
         },
+
+        toggleCheckboxes() {
+            for (let i = 0; i < this.sortedMonitorList.length; i++) {
+                this.sortedMonitorList[i].checked = this.selectAll;
+            }
+        },
     },
 };
 </script>
@@ -216,7 +244,9 @@ export default {
     position: sticky;
     top: 10px;
 }
-
+.item {
+    flex: 1;
+}
 .small-padding {
     padding-left: 5px !important;
     padding-right: 5px !important;
@@ -284,5 +314,9 @@ export default {
 .bottom-style {
     padding-left: 67px;
     margin-top: 5px;
+}
+
+.checkboxWrapper {
+    display: flex;
 }
 </style>

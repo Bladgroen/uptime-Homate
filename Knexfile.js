@@ -1,10 +1,10 @@
 require("dotenv").config({ path: "./secret.env" });
 
 const dbType = "mysql" || "sqlite3";
-const dbHost = process.env.DATABASEHOST;
-const dbName = process.env.DATABASENAME;
-const dbUser = process.env.DATABASEUSER;
-const dbPass = process.env.DATABASEPASSWORD;
+const dbHost = process.env.DB_HOST;
+const dbName = process.env.DB_NAME;
+const dbUser = process.env.DB_USER;
+const dbPass = process.env.DB_PASSWORD;
 
 let database;
 
