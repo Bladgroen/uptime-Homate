@@ -25,6 +25,11 @@
         </div>
 
         <div class="monitor-list" :class="{ scrollbar: scrollbar }">
+            <input
+                :checked="selectAllCheckbox"
+                type="checkbox"
+                @change="toggleSelectAll"
+            />
             <div
                 v-if="Object.keys($root.monitorList).length === 0"
                 class="text-center mt-3"
@@ -188,9 +193,12 @@ export default {
             return reactiveResult;
         },
 
-        selectAll: {
+        selectAllCheckbox: {
             get() {
-                return this.sortedMonitorList.every((item) => item.checked);
+                return (
+                    this.sortedMonitorList.length > 0 &&
+                    this.sortedMonitorList.every((item) => item.checked)
+                );
             },
             set(value) {
                 this.sortedMonitorList.forEach((item) => {
@@ -228,9 +236,18 @@ export default {
         },
 
         toggleCheckboxes() {
-            for (let i = 0; i < this.sortedMonitorList.length; i++) {
-                this.sortedMonitorList[i].checked = this.selectAll;
-            }
+            const areAllChecked = this.sortedMonitorList.every(
+                (item) => item.checked
+            );
+            this.selectAllCheckbox = areAllChecked;
+        },
+
+        toggleSelectAll() {
+            const selectAllValue = !this.selectAllCheckbox; // Invert the current value
+            this.sortedMonitorList.forEach((item) => {
+                item.checked = selectAllValue;
+            });
+            this.selectAllCheckbox = selectAllValue;
         },
     },
 };
