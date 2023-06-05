@@ -1256,6 +1256,24 @@ let needSetup = false;
             }
         });
 
+        socket.on("deleteUser", async (userID, callback) => {
+            try {
+                checkLogin(socket);
+
+                await R.exec("DELETE FROM user WHERE id = ?", [userID]);
+
+                callback({
+                    ok: true,
+                    msg: "Deleted Successfully.",
+                });
+            } catch (e) {
+                callback({
+                    ok: false,
+                    msg: e.message,
+                });
+            }
+        });
+
         socket.on(
             "addMonitorTag",
             async (tagID, monitorID, value, callback) => {
@@ -2027,6 +2045,7 @@ async function initDatabase(testMode = false) {
 
     // If there is no record in user table, it is a new Uptime Kuma instance, need to setup
     if ((await R.count("user")) === 0) {
+        console.log("need setup");
         log.info("server", "No user, need setup");
         needSetup = true;
     }

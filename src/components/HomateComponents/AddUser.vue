@@ -131,6 +131,9 @@ export default {
                         if (res.ok) {
                             this.processing = true;
                             this.isModalOpen = false;
+                            this.firstPassword = "";
+                            this.secondPassword = "";
+                            this.userName = "";
                         }
                     }
                 );
