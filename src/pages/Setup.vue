@@ -106,7 +106,7 @@ export default {
     watch: {},
     mounted() {
         this.$root.getSocket().emit("needSetup", (needSetup) => {
-            if (! needSetup) {
+            if (!needSetup) {
                 this.$router.push("/");
             }
         });
@@ -127,7 +127,7 @@ export default {
 
             this.$root
                 .getSocket()
-                .emit("setup", this.username, this.password, (res) => {
+                .emit("setup", this.username, this.password, true, (res) => {
                     this.processing = false;
                     this.$root.toastRes(res);
 

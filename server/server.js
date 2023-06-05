@@ -763,7 +763,11 @@ let needSetup = false;
                     let user = R.dispense("user");
                     user.username = username;
                     user.password = passwordHash.generate(password);
-                    user.role = role;
+                    if (role) {
+                        user.role = "admin";
+                    } else {
+                        user.role = "user";
+                    }
                     await R.store(user);
 
                     callback({

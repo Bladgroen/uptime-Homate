@@ -5,7 +5,14 @@
             <h5 class="my-4 settings-subheading">
                 {{ $t("Users") }}
             </h5>
-            <UserComponent></UserComponent>
+
+            <div v-for="user in $root.userList" :key="user">
+                <UserComponent
+                    :name="user.username"
+                    :userId="user.id"
+                    :role="user.role"
+                ></UserComponent>
+            </div>
             <AddUser></AddUser>
             <template v-if="!settings.disableAuth">
                 <h5 class="my-4 settings-subheading">
@@ -180,6 +187,7 @@ export default {
         this.$root.getSocket().emit("getUsers", (res) => {
             console.log(res);
         });
+        this.$root.getUserList();
     },
 
     methods: {
