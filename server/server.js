@@ -833,6 +833,15 @@ let needSetup = false;
             }
         });
 
+        socket.on("createUserList", async (userorganization, callback) => {
+            try {
+                checkLogin(socket);
+                await server.sendUserList(socket);
+            } catch (e) {
+                console.log(e);
+            }
+        });
+
         socket.on("pushToken", async (token, callback) => {
             try {
                 checkLogin(socket);

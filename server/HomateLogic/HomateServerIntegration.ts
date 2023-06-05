@@ -203,10 +203,7 @@ async function checkUpdateCore(monitorURL) {
             monitorURL + "/api/hassio/core/info",
             await createConfig()
         );
-        console.log(
-            "🚀 ~ file: HomateServerIntegration.ts:183 ~ checkUpdateCore ~ response.data.data.update_available:",
-            response.data.data.update_available
-        );
+
         return response.data.data.update_available;
     } catch (error) {
         console.error(error);

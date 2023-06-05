@@ -690,7 +690,7 @@ table {
 .openPingChart {
     display: flex;
     justify-content: center;
-
+    cursor: pointer;
     svg {
         align-self: center;
         margin-bottom: 1rem;
@@ -718,6 +718,7 @@ table {
     justify-content: center;
     border-radius: 20px;
     text-align: center;
+    cursor: pointer;
     svg {
         position: absolute;
         top: 10px;
@@ -726,6 +727,9 @@ table {
         fill: #b1b8c0;
         cursor: pointer;
     }
+}
+
+.modal:hover {
 }
 
 .pingmodal {

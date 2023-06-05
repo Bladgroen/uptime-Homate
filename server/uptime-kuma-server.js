@@ -143,6 +143,35 @@ class UptimeKumaServer {
         return list;
     }
 
+    async sendUserList(socket) {
+        let userList = await this.getUserList(socket.user_organization);
+        this.io.to(socket.user_organization).emit("userList", userList);
+        return userList;
+    }
+
+    async getUserList(userorganization) {
+        try {
+            let users = await R.find("user", "user_organization = ?", [
+                userorganization,
+            ]);
+
+            let userList = [];
+            users.forEach((userObj) => {
+                let user = {
+                    id: userObj.id,
+                    username: userObj.username,
+                    userOrganization: userObj.user_organization,
+                    role: userObj.role,
+                };
+                userList.push(user);
+            });
+
+            return userList;
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     /**
      * Get a list of monitors for the given user.
      * @param {string} userID - The ID of the user to get monitors for.

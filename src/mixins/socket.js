@@ -40,6 +40,7 @@ export default {
             heartbeatList: {},
             importantHeartbeatList: {},
             avgPingList: {},
+            userList: {},
             uptimeList: {},
             tlsInfoList: {},
             notificationList: [],
@@ -132,10 +133,13 @@ export default {
                 this.monitorList = data;
             });
 
+            socket.on("userList", (data) => {
+                this.userList = data;
+            });
+
             socket.on("addOnsList", (data) => {
                 this.addOnList = data;
             });
-
 
             socket.on("maintenanceList", (data) => {
                 this.maintenanceList = data;
@@ -508,6 +512,13 @@ export default {
                 callback = () => {};
             }
             socket.emit("getMonitorList", callback);
+        },
+
+        getUserList(callback) {
+            if (!callback) {
+                callback = () => {};
+            }
+            socket.emit("createUserList", callback);
         },
 
         /**

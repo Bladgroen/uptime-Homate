@@ -92,6 +92,9 @@ export default {
             processing: false,
         };
     },
+    created() {
+        this.$root.getUserList();
+    },
     methods: {
         openModal() {
             this.isModalOpen = true;
