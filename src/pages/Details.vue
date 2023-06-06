@@ -431,13 +431,25 @@ export default {
         },
 
         getUsageData() {
-            this.$root.getSocket().emit("getUsage", this.$route.params.id);
+            console.log("hallo test");
+            try {
+                console.log("test");
+                this.$root.getSocket().emit("getUsage", this.$route.params.id);
+                this.$root.getSocket().on("usageData", (data) => {
+                    console.log(data);
+                    let { cpuUsage, memoryUsage } = data;
 
-            this.$root.getSocket().on("usageData", (data) => {
-                let { cpuUsage, memoryUsage } = data;
-                this.cpuUsage = cpuUsage;
-                this.memoryUsage = memoryUsage;
-            });
+                    this.cpuUsage = cpuUsage;
+                    this.memoryUsage = memoryUsage;
+                });
+                this.$root.getSocket().on("usageError", (errorData) => {
+                    console.log("Error occurred:", errorData.error);
+                    this.cpuUsage = 0;
+                    this.memoryUsage = 0;
+                });
+            } catch (e) {
+                console.log("emit functie kapoet");
+            }
         },
 
         /** Show dialog to confirm pause */

@@ -356,21 +356,28 @@ let needSetup = false;
                 clearInterval(intervalId);
                 intervalId = null;
             }
-            let usage = await getUsage(monitorID);
-
-            let cpuUsage = usage.cpu_percent;
-
-            let memoryUsage = usage.memory_percent;
-            socket.emit("usageData", { cpuUsage, memoryUsage });
-
-            intervalId = setInterval(async () => {
+            try {
                 let usage = await getUsage(monitorID);
 
                 let cpuUsage = usage.cpu_percent;
-
                 let memoryUsage = usage.memory_percent;
+
                 socket.emit("usageData", { cpuUsage, memoryUsage });
-            }, 1000);
+
+                intervalId = setInterval(async () => {
+                    try {
+                        let usage = await getUsage(monitorID);
+                        let cpuUsage = usage.cpu_percent;
+                        let memoryUsage = usage.memory_percent;
+                        socket.emit("usageData", { cpuUsage, memoryUsage });
+                    } catch (error) {
+                        socket.emit("usageError", { error: error.message });
+                    }
+                }, 1000);
+            } catch (error) {
+                console.log("tis kapoet in de server");
+                socket.emit("usageError", { error: error.message });
+            }
 
             socket.on("disconnect", () => {
                 clearInterval(intervalId);
@@ -868,8 +875,13 @@ let needSetup = false;
             async (addonSlug, monitorURL, addonID, callback) => {
                 try {
                     checkLogin(socket);
-                    await updateAddOns(addonSlug, monitorURL, addonID);
+                    //await updateAddOns(addonSlug, monitorURL, addonID);
+                    let addonDB = await R.load("add_ons", addonID);
 
+                    addonDB.update_available = 0;
+                    console.log("🚀 ~ file: server.js:875 ~ addonDB:", addonDB);
+
+                    await R.store(addonDB);
                     log.info("Addon", `Updated addon: ${addonSlug}`);
 
                     callback({
@@ -877,12 +889,15 @@ let needSetup = false;
                         msg: "addon geupdate.",
                     });
                 } catch (e) {
+                    console.log(e);
                     log.error("Addon", `Error updating addon: ${addonSlug}`);
                     callback({
                         ok: false,
                         msg: e.message,
                     });
                 }
+                console.log("🚀 ~ file: server.js:895 ~ addonSlug:", addonSlug);
+                console.log("🚀 ~ file: server.js:895 ~ addonID:", addonID);
             }
         );
 

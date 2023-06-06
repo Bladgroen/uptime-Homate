@@ -389,7 +389,7 @@ exports.up = function (knex) {
                 table.string("name", 255);
                 table.boolean("active").notNullable().defaultTo(1);
                 table.string("slug", 255);
-                table.text("URL");
+                table.text("addons_url");
                 table.boolean("update_available").notNullable();
                 table.string("icon", 255);
                 table.integer("monitor_id").notNullable().unsigned();

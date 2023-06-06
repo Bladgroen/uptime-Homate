@@ -42,7 +42,7 @@ async function createAddons(monitorID, monitorURL) {
             const addon = {
                 name: addOn.name,
                 slug: addOn.slug,
-                url: addOn.url,
+                addons_url: addOn.url,
                 update_available: addOn.update_available,
                 icon: addOn.icon,
                 monitor_id: monitorID,
@@ -75,12 +75,6 @@ async function updateAddOns(slug, monitorURL, addonID) {
     };
     try {
         await axios.request(options);
-        let addonDB = await R.find("add_ons", "monitor_id = ? AND slug = ?", [
-            addonID,
-            slug,
-        ]);
-        addonDB.update_available = 0;
-        await R.store(addonDB);
     } catch (error) {
         console.error(error);
     }
@@ -101,7 +95,8 @@ async function getUsage(monitorID) {
         };
         return usage;
     } catch (error) {
-        console.error(error);
+        console.error("tis hier kapoet eh");
+        return null;
     }
 }
 
@@ -247,7 +242,6 @@ function encryptToken(token, encryptionKey) {
 
     return iv.toString("hex") + encrypted;
 }
-
 
 function decryptToken(encryptedToken, encryptionKey) {
     const iv = Buffer.from(encryptedToken.substr(0, 32), "hex");

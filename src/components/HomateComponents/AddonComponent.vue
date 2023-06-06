@@ -11,7 +11,6 @@
                 :id="id"
                 :slug="slug"
                 :name="name"
-                @update-parent="updateParentState"
             ></AddonUpdateButton>
         </div>
     </div>
@@ -56,7 +55,6 @@ export default {
     created() {
         //this.getAddOnHeartbeat();
         //this.test = this.getFilteredHeartbeatList(67);
-        console.log(this.test);
     },
     methods: {
         updateParentState(newValue) {
@@ -66,7 +64,6 @@ export default {
             this.$root.getSocket().emit("getAddonHeartbeat");
 
             this.$root.getSocket().on("addonHeartbeat", (data) => {
-                console.log("test");
                 this.heartbeat = data;
                 //this.filteredList = this.getFilteredHeartbeatList();
             });

@@ -3,7 +3,12 @@
         <font-awesome-icon icon="arrow-alt-circle-up" class="update__icon" />
         <p class="update__text">New Update!</p>
     </div>
-    <div v-if="isModalOpen" ref="modal" class="modal">
+    <div
+        v-if="isModalOpen"
+        ref="modal"
+        class="modal"
+        :class="{ show: isModalOpen }"
+    >
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 384 512"
@@ -15,7 +20,9 @@
         </svg>
         <h2>Do you want to update {{ name }}?</h2>
         <div class="modal__buttons">
-            <button @click="next">Confirm</button>
+            <button type="submit" :disabled="processing" @click="next">
+                Confirm
+            </button>
             <button @click="cancel">Cancel</button>
         </div>
     </div>
@@ -43,6 +50,7 @@ export default {
             addonID: this.id,
             monitorURL: this.$root.monitorList[this.$route.params.id],
             addonSlug: this.slug,
+            processing: false,
         };
     },
     beforeUnmount() {
@@ -68,8 +76,13 @@ export default {
                         this.monitorURL,
                         this.addonID,
                         (res) => {
-                            console.log(res);
+                            this.processing = false;
                             this.$root.toastRes(res);
+                            if (res.ok) {
+                                this.processing = true;
+                                this.isModalOpen = false;
+                                this.updateAddonRoot(this.addonID);
+                            }
                         }
                     );
                 this.updateParent();
@@ -84,6 +97,14 @@ export default {
         handleClickOutside(event) {
             if (this.$refs.modal && !this.$refs.modal.contains(event.target)) {
                 this.cancel();
+            }
+        },
+        updateAddonRoot(addonID) {
+            const index = this.$root.addOnList.findIndex(
+                (obj) => obj._id === addonID
+            );
+            if (index !== -1) {
+                this.$root.userList[index]._updateAvailable = 0;
             }
         },
     },
@@ -111,7 +132,7 @@ export default {
 }
 
 .modal {
-    display: flex;
+    display: none;
     flex-direction: column;
     position: fixed;
     border: black 1px solid;
@@ -155,5 +176,9 @@ export default {
         fill: #b1b8c0;
         cursor: pointer;
     }
+}
+
+.modal.show {
+    display: flex;
 }
 </style>
