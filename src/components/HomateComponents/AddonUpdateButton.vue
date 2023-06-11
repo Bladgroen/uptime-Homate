@@ -19,7 +19,17 @@
             />
         </svg>
         <h2>Do you want to update {{ name }}?</h2>
-        <div class="modal__buttons">
+        <div v-if="loading" class="lds-roller">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div v-if="!loading" class="modal__buttons">
             <button type="submit" :disabled="processing" @click="next">
                 Confirm
             </button>
@@ -51,6 +61,7 @@ export default {
             monitorURL: this.$root.monitorList[this.$route.params.id],
             addonSlug: this.slug,
             processing: false,
+            loading: false,
         };
     },
     beforeUnmount() {
@@ -65,27 +76,29 @@ export default {
             this.$emit("update-parent", 0);
         },
         async next() {
-            this.isModalOpen = false;
-            document.removeEventListener("mousedown", this.handleClickOutside);
+            this.loading = true;
             try {
-                this.$root
-                    .getSocket()
-                    .emit(
-                        "updateAddon",
-                        this.addonSlug,
-                        this.monitorURL,
-                        this.addonID,
-                        (res) => {
-                            this.processing = false;
-                            this.$root.toastRes(res);
-                            if (res.ok) {
-                                this.processing = true;
-                                this.isModalOpen = false;
-                                this.updateAddonRoot(this.addonID);
+                await new Promise((resolve, reject) => {
+                    this.$root
+                        .getSocket()
+                        .emit(
+                            "updateAddon",
+                            this.addonSlug,
+                            this.monitorURL,
+                            this.addonID,
+                            (res) => {
+                                this.processing = false;
+                                this.$root.toastRes(res);
+                                console.log(this.loading);
+                                resolve();
                             }
-                        }
-                    );
+                        );
+                });
+                this.processing = true;
+
+                this.updateAddonRoot(this.addonID);
                 this.updateParent();
+                this.isModalOpen = false;
             } catch (error) {
                 console.log(error);
             }
@@ -100,11 +113,20 @@ export default {
             }
         },
         updateAddonRoot(addonID) {
-            const index = this.$root.addOnList.findIndex(
-                (obj) => obj._id === addonID
-            );
-            if (index !== -1) {
-                this.$root.userList[index]._updateAvailable = 0;
+            const targetObject = this.$root.addOnList[
+                this.$route.params.id
+            ].find((obj) => obj._id === addonID);
+            console.log(targetObject);
+            if (targetObject) {
+                console.log(targetObject._updateAvailable);
+
+                Object.defineProperty(targetObject, "_updateAvailable", {
+                    value: 0,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true,
+                });
+                console.log(this.$root.addOnList[this.$route.params.id]);
             }
         },
     },
@@ -180,5 +202,90 @@ export default {
 
 .modal.show {
     display: flex;
+}
+
+.lds-roller {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+.lds-roller div {
+    animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    transform-origin: 40px 40px;
+}
+.lds-roller div:after {
+    content: " ";
+    display: block;
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #5cdd8b;
+    margin: -4px 0 0 -4px;
+}
+.lds-roller div:nth-child(1) {
+    animation-delay: -0.036s;
+}
+.lds-roller div:nth-child(1):after {
+    top: 63px;
+    left: 63px;
+}
+.lds-roller div:nth-child(2) {
+    animation-delay: -0.072s;
+}
+.lds-roller div:nth-child(2):after {
+    top: 68px;
+    left: 56px;
+}
+.lds-roller div:nth-child(3) {
+    animation-delay: -0.108s;
+}
+.lds-roller div:nth-child(3):after {
+    top: 71px;
+    left: 48px;
+}
+.lds-roller div:nth-child(4) {
+    animation-delay: -0.144s;
+}
+.lds-roller div:nth-child(4):after {
+    top: 72px;
+    left: 40px;
+}
+.lds-roller div:nth-child(5) {
+    animation-delay: -0.18s;
+}
+.lds-roller div:nth-child(5):after {
+    top: 71px;
+    left: 32px;
+}
+.lds-roller div:nth-child(6) {
+    animation-delay: -0.216s;
+}
+.lds-roller div:nth-child(6):after {
+    top: 68px;
+    left: 24px;
+}
+.lds-roller div:nth-child(7) {
+    animation-delay: -0.252s;
+}
+.lds-roller div:nth-child(7):after {
+    top: 63px;
+    left: 17px;
+}
+.lds-roller div:nth-child(8) {
+    animation-delay: -0.288s;
+}
+.lds-roller div:nth-child(8):after {
+    top: 56px;
+    left: 12px;
+}
+@keyframes lds-roller {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 </style>

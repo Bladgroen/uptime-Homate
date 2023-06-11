@@ -35,6 +35,16 @@ async function getAddOns(monitorURL) {
     }
 }
 
+async function mockAPI() {
+    try {
+        return new Promise((res, rej) => {
+            setTimeout(() => res("response"), 10000);
+        });
+    } catch (e) {
+        console.log("error unknown");
+    }
+}
+
 async function createAddons(monitorID, monitorURL) {
     try {
         const addOn = await getAddOns(monitorURL);
@@ -95,7 +105,7 @@ async function getUsage(monitorID) {
         };
         return usage;
     } catch (error) {
-        console.error("tis hier kapoet eh");
+        console.error(error.message);
         return null;
     }
 }
@@ -283,4 +293,5 @@ module.exports = {
     updateCore,
     getAddOnHeartbeat,
     getAllUsers,
+    mockAPI,
 };

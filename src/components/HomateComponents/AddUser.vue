@@ -129,6 +129,7 @@ export default {
                         this.processing = false;
                         this.$root.toastRes(res);
                         if (res.ok) {
+                            this.addUserRoot(this.username);
                             this.processing = true;
                             this.isModalOpen = false;
                             this.firstPassword = "";
@@ -137,6 +138,14 @@ export default {
                         }
                     }
                 );
+        },
+        addUserRoot(username) {
+            let user = {
+                username: username,
+                userOrganization: 1,
+                role: "user",
+            };
+            this.$root.userList.push(user);
         },
     },
 };

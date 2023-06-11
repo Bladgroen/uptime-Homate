@@ -6,11 +6,13 @@
             <p>{{ name }}</p>
         </div>
         <div class="addon__status"><div></div></div>
+        <p>{{ u }}</p>
         <div v-if="update === 1" class="addon__update">
             <AddonUpdateButton
                 :id="id"
                 :slug="slug"
                 :name="name"
+                @update-parent="updateParentState"
             ></AddonUpdateButton>
         </div>
     </div>
@@ -57,8 +59,8 @@ export default {
         //this.test = this.getFilteredHeartbeatList(67);
     },
     methods: {
-        updateParentState(newValue) {
-            this.update = newValue;
+        updateParentState() {
+            this.update = 0;
         },
         getAddOnHeartbeat() {
             this.$root.getSocket().emit("getAddonHeartbeat");

@@ -43,7 +43,7 @@
                     :url="monitor.url"
                 ></CoreUpdateButton>
             </div>
-
+            
             <div class="functions">
                 <div class="btn-group" role="group">
                     <button
@@ -329,6 +329,7 @@ export default {
             monitorURL: this.$root.monitorList[this.$route.params.id],
             varFromRoute: null,
             isModalOpen: false,
+            isTokenModalOpen: false,
         };
     },
     computed: {
@@ -420,6 +421,7 @@ export default {
 
     mounted() {
         this.getUsageData();
+        this.checkTokenInDatabase();
     },
 
     beforeUnmount() {},
@@ -430,10 +432,20 @@ export default {
             toast.success("Test notification is requested.");
         },
 
-        getUsageData() {
-            console.log("hallo test");
+        checkTokenInDatabase() {
+            console.log("token method");
             try {
-                console.log("test");
+                this.$root.getSocket().emit("checkToken");
+                this.$root.getSocket().on("checkedToken", (data) => {
+                    console.log(data);
+                });
+            } catch (e) {
+                console.log(e.message);
+            }
+        },
+
+        getUsageData() {
+            try {
                 this.$root.getSocket().emit("getUsage", this.$route.params.id);
                 this.$root.getSocket().on("usageData", (data) => {
                     console.log(data);
@@ -448,7 +460,7 @@ export default {
                     this.memoryUsage = 0;
                 });
             } catch (e) {
-                console.log("emit functie kapoet");
+                console.log(e.message);
             }
         },
 
@@ -561,6 +573,14 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/vars.scss";
+
+.btn-group {
+    position: inherit;
+}
+
+.btn {
+    position: inherit;
+}
 
 @media (max-width: 767px) {
     .badge {

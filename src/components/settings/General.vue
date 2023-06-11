@@ -163,6 +163,7 @@
                         class="form-control"
                         name="Token"
                         placeholder="Token"
+                        type="password"
                     />
                     <button
                         class="btn btn-outline-primary"

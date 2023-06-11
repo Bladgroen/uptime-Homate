@@ -1,14 +1,14 @@
 <template>
     <div>
         <div class="groupInfo">
-            <img src="../../../public/Homate.jpg" />
-            <h3>Naam</h3>
+            <img src="../../../public/homeassistant.png" />
+            <h3>Core</h3>
         </div>
         <div class="updateButton">
             <font-awesome-icon
                 icon="arrow-alt-circle-up"
                 class="update__icon"
-            />Updaten
+            />Update
         </div>
     </div>
 </template>

@@ -26,6 +26,7 @@ const {
     updateCore,
     getAddOnHeartbeat,
     getAllUsers,
+    mockAPI,
 } = require("./HomateLogic/HomateServerIntegration.ts");
 
 // Check Node.js Version
@@ -347,6 +348,15 @@ let needSetup = false;
             return users;
         });
 
+        socket.on("checkToken", async () => {
+            await checkLogin(socket);
+            let token = await R.findAll("token");
+            if (!token.length) {
+                console.log("no token found");
+                socket.emit("checkedToken", false);
+            }
+        });
+
         let intervalId = null;
 
         socket.on("getUsage", async (monitorID) => {
@@ -375,7 +385,7 @@ let needSetup = false;
                     }
                 }, 1000);
             } catch (error) {
-                console.log("tis kapoet in de server");
+                console.log(error.message);
                 socket.emit("usageError", { error: error.message });
             }
 
@@ -874,14 +884,15 @@ let needSetup = false;
             "updateAddon",
             async (addonSlug, monitorURL, addonID, callback) => {
                 try {
-                    checkLogin(socket);
+                    //checkLogin(socket);
                     //await updateAddOns(addonSlug, monitorURL, addonID);
+                    await mockAPI();
                     let addonDB = await R.load("add_ons", addonID);
 
                     addonDB.update_available = 0;
                     console.log("🚀 ~ file: server.js:875 ~ addonDB:", addonDB);
 
-                    await R.store(addonDB);
+                    //await R.store(addonDB);
                     log.info("Addon", `Updated addon: ${addonSlug}`);
 
                     callback({

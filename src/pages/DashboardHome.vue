@@ -14,24 +14,32 @@
                     </div>
                     <div class="col">
                         <h3>{{ $t("Down") }}</h3>
-                        <span class="num text-danger">{{ $root.stats.down }}</span>
+                        <span class="num text-danger">{{
+                            $root.stats.down
+                        }}</span>
                     </div>
                     <div class="col">
-                        <h3>{{ $t("Maintenance") }}</h3>
-                        <span class="num text-maintenance">{{ $root.stats.maintenance }}</span>
+                        <h3>{{ $t("Warning") }}</h3>
+                        <span class="num text-maintenance">{{
+                            $root.stats.maintenance
+                        }}</span>
                     </div>
                     <div class="col">
                         <h3>{{ $t("Unknown") }}</h3>
-                        <span class="num text-secondary">{{ $root.stats.unknown }}</span>
+                        <span class="num text-secondary">{{
+                            $root.stats.unknown
+                        }}</span>
                     </div>
                     <div class="col">
                         <h3>{{ $t("pauseDashboardHome") }}</h3>
-                        <span class="num text-secondary">{{ $root.stats.pause }}</span>
+                        <span class="num text-secondary">{{
+                            $root.stats.pause
+                        }}</span>
                     </div>
                 </div>
             </div>
 
-            <div class="shadow-box table-shadow-box" style="overflow-x: hidden;">
+            <div class="shadow-box table-shadow-box" style="overflow-x: hidden">
                 <table class="table table-borderless table-hover">
                     <thead>
                         <tr>
@@ -42,10 +50,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(beat, index) in displayedRecords" :key="index" :class="{ 'shadow-box': $root.windowWidth <= 550}">
-                            <td><router-link :to="`/dashboard/${beat.monitorID}`">{{ beat.name }}</router-link></td>
+                        <tr
+                            v-for="(beat, index) in displayedRecords"
+                            :key="index"
+                            :class="{ 'shadow-box': $root.windowWidth <= 550 }"
+                        >
+                            <td>
+                                <router-link
+                                    :to="`/dashboard/${beat.monitorID}`"
+                                >
+                                    {{ beat.name }}
+                                </router-link>
+                            </td>
                             <td><Status :status="beat.status" /></td>
-                            <td :class="{ 'border-0':! beat.msg}"><Datetime :value="beat.time" /></td>
+                            <td :class="{ 'border-0': !beat.msg }">
+                                <Datetime :value="beat.time" />
+                            </td>
                             <td class="border-0">{{ beat.msg }}</td>
                         </tr>
 
@@ -94,7 +114,6 @@ export default {
         };
     },
     computed: {
-
         importantHeartBeatList() {
             let result = [];
 
@@ -146,6 +165,10 @@ export default {
     color: $primary;
     font-weight: bold;
     display: block;
+}
+
+.text-maintenance {
+    color: orange !important;
 }
 
 .shadow-box {

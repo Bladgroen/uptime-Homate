@@ -66,12 +66,15 @@
         </div>
 
         <div class="monitor-list" :class="{ scrollbar: scrollbar }">
-            <input
-                :checked="selectAllCheckbox"
-                type="checkbox"
-                class="form-check-input"
-                @change="toggleSelectAll"
-            />
+            <div class="selectAll">
+                <input
+                    :checked="selectAllCheckbox"
+                    type="checkbox"
+                    class="form-check-input"
+                    @change="toggleSelectAll"
+                />
+                <p>Select all</p>
+            </div>
             <div
                 v-if="Object.keys($root.monitorList).length === 0"
                 class="text-center mt-3"
@@ -120,9 +123,28 @@
                         <div
                             v-show="$root.userHeartbeatBar == 'normal'"
                             :key="$root.userHeartbeatBar"
-                            class="col-3 col-md-4"
+                            class="col-3 col-md-4 status"
                         >
                             <HAStatus :monitor-id="item.id" size="small" />
+                            <div class="updateNotification">
+                                <svg
+                                    data-v-1796dc39=""
+                                    class="svg-inline--fa fa-arrow-alt-circle-up fa-w-16 update__icon"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    data-prefix="fas"
+                                    data-icon="arrow-alt-circle-up"
+                                    role="img"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 512 512"
+                                >
+                                    <path
+                                        class=""
+                                        fill="currentColor"
+                                        d="M8 256C8 119 119 8 256 8s248 111 248 248-111 248-248 248S8 393 8 256zm292 116V256h70.9c10.7 0 16.1-13 8.5-20.5L264.5 121.2c-4.7-4.7-12.2-4.7-16.9 0l-115 114.3c-7.6 7.6-2.2 20.5 8.5 20.5H212v116c0 6.6 5.4 12 12 12h64c6.6 0 12-5.4 12-12z"
+                                    ></path>
+                                </svg>
+                            </div>
                         </div>
                     </div>
 
@@ -420,7 +442,7 @@ export default {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     width: 80%;
     max-width: 400px;
-    height: 80%;
+    height: 50%;
     background-color: #0d1117;
     align-items: center;
     justify-content: center;
@@ -446,5 +468,31 @@ export default {
 
 .updateTitel {
     color: white;
+}
+
+.status {
+    display: flex;
+    .updateNotification {
+        display: flex;
+        justify-content: center; /* Center horizontally */
+        align-items: center;
+
+        color: white;
+        background-color: #0dcaf0;
+        border-radius: 3.125rem;
+        width: 25px;
+        height: 25px;
+        margin: 0 auto;
+        svg {
+            margin: 5px;
+        }
+    }
+}
+
+.selectAll {
+    display: flex;
+    input {
+        margin-right: 1rem;
+    }
 }
 </style>

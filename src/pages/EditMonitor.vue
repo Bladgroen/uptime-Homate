@@ -2,6 +2,30 @@
     <transition name="slide-fade" appear>
         <div>
             <h1 class="mb-3">{{ pageName }}</h1>
+            <div
+                v-if="isTokenModalOpen"
+                ref="modal"
+                :class="{ show: isTokenModalOpen }"
+                class="modal"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 384 512"
+                    @click="cancel"
+                >
+                    <path
+                        d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+                    />
+                </svg>
+                <h2>Token not yet added.</h2>
+                <p href="">
+                    Get home assistant bearer
+                    <a href="https://www.home-assistant.io/docs/authentication/"
+                        >here</a
+                    >.
+                </p>
+                <a class="addUserButton" href="/settings/general">Add Token</a>
+            </div>
             <form @submit.prevent="submit">
                 <div class="shadow-box shadow-box-with-fixed-bottom-bar">
                     <div class="row">
@@ -1444,6 +1468,7 @@ export default {
                 redis: "redis://user:password@host:port",
                 mongodb: "mongodb://username:password@host:port/database",
             },
+            isTokenModalOpen: false,
         };
     },
 
@@ -1661,6 +1686,7 @@ message HealthCheckResponse {
     },
     mounted() {
         this.init();
+        this.checkTokenInDatabase();
 
         let acceptedStatusCodeOptions = [
             "100-199",
@@ -1789,6 +1815,17 @@ message HealthCheckResponse {
                     });
             }
         },
+        checkTokenInDatabase() {
+            console.log("token method");
+            try {
+                this.$root.getSocket().emit("checkToken");
+                this.$root.getSocket().on("checkedToken", (data) => {
+                    this.isTokenModalOpen = true;
+                });
+            } catch (e) {
+                console.log(e.message);
+            }
+        },
 
         /**
          * Validate form input
@@ -1816,6 +1853,20 @@ message HealthCheckResponse {
                 }
             }
             return true;
+        },
+
+        openModal() {
+            this.isTokenModalOpen = true;
+            document.addEventListener("mousedown", this.handleClickOutside);
+        },
+        cancel() {
+            this.isTokenModalOpen = false;
+            document.removeEventListener("mousedown", this.handleClickOutside);
+        },
+        handleClickOutside(event) {
+            if (this.$refs.modal && !this.$refs.modal.contains(event.target)) {
+                this.cancel();
+            }
         },
 
         /**
@@ -1926,5 +1977,54 @@ message HealthCheckResponse {
 
 textarea {
     min-height: 200px;
+}
+
+.modal {
+    display: none;
+    flex-direction: column;
+    border: black 1px solid;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    padding: 2rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    width: 80%;
+    max-width: 400px;
+    height: 40%;
+    background-color: #0d1117;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    text-align: center;
+
+    h2 {
+        padding-bottom: 1rem;
+    }
+
+    svg {
+        position: absolute;
+        top: 10px;
+        right: 30px;
+        width: 30px;
+        fill: #b1b8c0;
+        cursor: pointer;
+    }
+}
+.modal.show {
+    display: flex;
+}
+
+.addUserButton {
+    background-color: #5cdd8b;
+    color: black !important;
+    padding: 0.375rem 0.75rem;
+    border: none;
+    border-radius: 50px;
+    line-height: 1.5;
+    cursor: pointer;
+    text-decoration: none;
 }
 </style>

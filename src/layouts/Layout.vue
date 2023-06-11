@@ -38,23 +38,7 @@
                 <span class="fs-4 title">{{ $t("Homate") }}</span>
             </router-link>
 
-            <a
-                v-if="hasNewVersion"
-                target="_blank"
-                href="https://github.com/louislam/uptime-kuma/releases"
-                class="btn btn-info me-3"
-            >
-                <font-awesome-icon icon="arrow-alt-circle-up" />
-                {{ $t("New Update") }}
-            </a>
-
             <ul class="nav nav-pills">
-                <li v-if="$root.loggedIn" class="nav-item me-2">
-                    <router-link to="/manage-status-page" class="nav-link">
-                        <font-awesome-icon icon="stream" />
-                        {{ $t("Status Pages") }}
-                    </router-link>
-                </li>
                 <li v-if="$root.loggedIn" class="nav-item me-2">
                     <router-link to="/dashboard" class="nav-link">
                         <font-awesome-icon icon="tachometer-alt" />
@@ -214,7 +198,9 @@ export default {
     },
 
     data() {
-        return {};
+        return {
+            isTokenPopupOpen: false,
+        };
     },
 
     computed: {
@@ -242,9 +228,23 @@ export default {
 
     watch: {},
 
-    mounted() {},
+    mounted() {
+        this.checkTokenInDatabase();
+    },
 
-    methods: {},
+    methods: {
+        checkTokenInDatabase() {
+            console.log("token method");
+            try {
+                this.$root.getSocket().emit("checkToken");
+                this.$root.getSocket().on("checkedToken", (data) => {
+                    console.log(data);
+                });
+            } catch (e) {
+                console.log(e.message);
+            }
+        },
+    },
 };
 </script>
 
@@ -406,5 +406,43 @@ main {
     .bottom-nav {
         background-color: $dark-bg;
     }
+}
+
+.modal {
+    display: none;
+    flex-direction: column;
+    border: black 1px solid;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    padding: 2rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    width: 80%;
+    max-width: 400px;
+    height: 80%;
+    background-color: #0d1117;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    text-align: center;
+
+    h2 {
+        padding-bottom: 1rem;
+    }
+
+    svg {
+        position: absolute;
+        top: 10px;
+        right: 30px;
+        width: 30px;
+        fill: #b1b8c0;
+        cursor: pointer;
+    }
+}
+.modal.show {
+    display: flex;
 }
 </style>
