@@ -170,6 +170,7 @@ const {
     sendProxyList,
     sendDockerHostList,
     sendAPIKeyList,
+    sendAddonHeartbeatList
 } = require("./client");
 const {
     statusPageSocketHandler,
@@ -2022,6 +2023,8 @@ async function afterLogin(socket, user) {
     for (let monitorID in monitorList) {
         await sendHeartbeatList(socket, monitorID);
     }
+    await sendAddonHeartbeatList(socket, addonList);
+    //TODO
 
     for (let monitorID in monitorList) {
         await sendImportantHeartbeatList(socket, monitorID);

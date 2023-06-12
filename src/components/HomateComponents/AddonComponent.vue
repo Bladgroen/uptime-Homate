@@ -5,8 +5,9 @@
 
             <p>{{ name }}</p>
         </div>
-        <div class="addon__status"><div></div></div>
-        <p>{{ u }}</p>
+        <div class="addon__status" :class="addonHeartbeat">
+            <div></div>
+        </div>
         <div v-if="update === 1" class="addon__update">
             <AddonUpdateButton
                 :id="id"
@@ -45,6 +46,10 @@ export default {
             type: Number,
             required: true,
         },
+        addonHeartbeat: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {
@@ -54,10 +59,7 @@ export default {
             filteredList: {},
         };
     },
-    created() {
-        //this.getAddOnHeartbeat();
-        //this.test = this.getFilteredHeartbeatList(67);
-    },
+    created() {},
     methods: {
         updateParentState() {
             this.update = 0;
@@ -126,10 +128,19 @@ export default {
             border-radius: 50px;
             width: 3.125rem;
             height: 3.125rem;
+        }
+    }
+    .started {
+        div {
             background-color: #5cdd8b;
         }
     }
 
+    .error {
+        div {
+            background-color: red;
+        }
+    }
     &__update {
     }
 }

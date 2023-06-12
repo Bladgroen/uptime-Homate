@@ -125,7 +125,10 @@
                             :key="$root.userHeartbeatBar"
                             class="col-3 col-md-4 status"
                         >
-                            <HAStatus :monitor-id="item.id" size="small" />
+                            <MonitorListStatus
+                                :monitor-id="item.id"
+                                size="small"
+                            />
                             <div class="updateNotification">
                                 <svg
                                     data-v-1796dc39=""
@@ -162,6 +165,7 @@
 <script>
 import HeartbeatBar from "../components/HeartbeatBar.vue";
 import HAStatus from "../components/HomateComponents/HAStatus.vue";
+import MonitorListStatus from "../components/HomateComponents/MonitorListStatus.vue";
 import Tag from "../components/Tag.vue";
 import Uptime from "../components/Uptime.vue";
 import UpdateGroup from "../components/HomateComponents/UpdateGroup.vue";
@@ -172,6 +176,7 @@ export default {
         Tag,
         HAStatus,
         UpdateGroup,
+        MonitorListStatus,
     },
     props: {
         /** Should the scrollbar be shown */

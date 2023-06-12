@@ -43,7 +43,7 @@
                     :url="monitor.url"
                 ></CoreUpdateButton>
             </div>
-            
+
             <div class="functions">
                 <div class="btn-group" role="group">
                     <button

@@ -11,6 +11,9 @@
                 :name="addon._name"
                 :updateAvailable="addon._updateAvailable"
                 :slug="addon._slug"
+                :addonHeartbeat="
+                    $root.addonHeartbeatList[$route.params.id][addon._id].msg
+                "
                 class="addoncomponent"
             ></AddonComponent>
         </div>

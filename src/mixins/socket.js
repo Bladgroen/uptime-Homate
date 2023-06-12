@@ -231,7 +231,10 @@ export default {
                 }
             });
 
-            socket.on("addonHeartbeatList" )
+            socket.on("addonHeartbeatList", (data) => {
+                console.log(data);
+                this.addonHeartbeatList = data;
+            });
 
             socket.on("avgPing", (monitorID, data) => {
                 this.avgPingList[monitorID] = data;
