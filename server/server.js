@@ -2009,6 +2009,7 @@ async function afterLogin(socket, user) {
     socket.join(user.user_organization);
 
     let monitorList = await server.sendMonitorList(socket);
+    let addonList = await server.sendAddonList(socket);
     server.sendMaintenanceList(socket);
     sendNotificationList(socket);
     sendProxyList(socket);

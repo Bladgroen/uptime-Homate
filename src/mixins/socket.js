@@ -38,6 +38,7 @@ export default {
             maintenanceList: {},
             apiKeyList: {},
             heartbeatList: {},
+            addonHeartbeatList: {},
             importantHeartbeatList: {},
             avgPingList: {},
             userList: {},
@@ -229,6 +230,8 @@ export default {
                     );
                 }
             });
+
+            socket.on("addonHeartbeatList" )
 
             socket.on("avgPing", (monitorID, data) => {
                 this.avgPingList[monitorID] = data;

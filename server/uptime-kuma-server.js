@@ -143,6 +143,11 @@ class UptimeKumaServer {
         return list;
     }
 
+    async sendAddonList(socket) {
+        let addon = await this.getAddOnsList();
+        return addon;
+    }
+
     async sendUserList(socket) {
         let userList = await this.getUserList(socket.user_organization);
         this.io.to(socket.user_organization).emit("userList", userList);
@@ -181,7 +186,6 @@ class UptimeKumaServer {
      */
     async getMonitorJSONList(userID) {
         let result = {};
-        console.log("userID", userID);
         let monitorList = await R.find(
             "monitor",
             "user_organization = ? ORDER BY weight DESC, name",
@@ -200,12 +204,13 @@ class UptimeKumaServer {
         let organizedData = {};
 
         addonList.forEach((row) => {
-            const key = row.monitor_id.toString();
-            if (organizedData[key]) {
-                organizedData[key].push(row);
-            } else {
-                organizedData[key] = [row];
+            const monitorId = row.monitor_id.toString();
+            const addonId = row._id.toString();
+            if (!organizedData[monitorId]) {
+                organizedData[monitorId] = {};
             }
+
+            organizedData[monitorId][addonId] = row;
         });
 
         return organizedData;

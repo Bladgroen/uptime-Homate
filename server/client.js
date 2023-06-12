@@ -76,6 +76,237 @@ async function sendHeartbeatList(
     timeLogger.print(`[Monitor: ${monitorID}] sendHeartbeatList`);
 }
 
+async function sendAddonHeartbeatList(socket, monitorID, toUser = false) {
+    const timeLogger = new TimeLogger();
+
+    let list = {
+        1: [
+            {
+                id: 1,
+                items: [
+                    {
+                        id: 1,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+            {
+                id: 2,
+                items: [
+                    {
+                        id: 1,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+            {
+                id: 3,
+                items: [
+                    {
+                        id: 1,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+            {
+                id: 4,
+                items: [
+                    {
+                        id: 1,
+                        msg: "error",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "error",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "error",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+            {
+                id: 5,
+                items: [
+                    {
+                        id: 1,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+            {
+                id: 6,
+                items: [
+                    {
+                        id: 1,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+            {
+                id: 7,
+                items: [
+                    {
+                        id: 1,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+            {
+                id: 8,
+                items: [
+                    {
+                        id: 1,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+            {
+                id: 9,
+                items: [
+                    {
+                        id: 1,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+            {
+                id: 10,
+                items: [
+                    {
+                        id: 1,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+            {
+                id: 11,
+                items: [
+                    {
+                        id: 1,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 2,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                    {
+                        id: 3,
+                        msg: "started",
+                        time: "2023-06-11T19:46:10.000Z",
+                    },
+                ],
+            },
+        ],
+    };
+
+    
+}
+
 /**
  * Important Heart beat list (aka event list)
  * @param {Socket} socket Socket.io instance
