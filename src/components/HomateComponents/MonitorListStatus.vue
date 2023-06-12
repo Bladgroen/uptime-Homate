@@ -51,16 +51,7 @@ export default {
             }
         },
         checkaddon() {
-            let list = this.$root.addOnList[this.monitorId];
-            if (typeof list !== "object" || list === null) {
-                return false;
-            }
-            for (let key in list) {
-                if (list[key]._active === 0) {
-                    return false;
-                }
-            }
-            return true;
+            return this.updateStats();
         },
 
         shortBeatList() {
@@ -103,7 +94,22 @@ export default {
     mounted() {
         console.log(this.checkaddon);
     },
-    methods: {},
+    methods: {
+        updateStats() {
+            let list = this.$root.addOnList[this.monitorId];
+            if (typeof list !== "object" || list === null) {
+                return false;
+            }
+            for (let key in list) {
+                if (list[key]._active === 0) {
+                    this.$root.stats.maintenance = 1;
+                    this.$root.stats.up = 0;
+                    return false;
+                }
+            }
+            return true;
+        },
+    },
 };
 </script>
 
